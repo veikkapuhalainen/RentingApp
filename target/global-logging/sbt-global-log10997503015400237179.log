@@ -1,0 +1,38 @@
+[debug] > Exec(run, None, None)
+[debug] Evaluating tasks: Compile / run
+[debug] Running task... Cancel: Signal, check cycles: false, forcegc: true
+[info] compiling 2 Scala sources to C:\Users\veikk\courses\RentingApp\target\scala-3.3.1\classes ...
+[error] -- [E006] Not Found Error: C:\Users\veikk\courses\RentingApp\src\main\scala\harjotus.scala:1:7 
+[error] 1 |import scalafx.application.JFXApp3
+[error]   |       ^^^^^^^
+[error]   |       Not found: scalafx
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] -- [E006] Not Found Error: C:\Users\veikk\courses\RentingApp\src\main\scala\harjotus.scala:2:7 
+[error] 2 |import scalafx.scene.Scene
+[error]   |       ^^^^^^^
+[error]   |       Not found: scalafx
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] -- [E006] Not Found Error: C:\Users\veikk\courses\RentingApp\src\main\scala\harjotus.scala:3:7 
+[error] 3 |import scalafx.scene.layout.Pane
+[error]   |       ^^^^^^^
+[error]   |       Not found: scalafx
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] -- [E006] Not Found Error: C:\Users\veikk\courses\RentingApp\src\main\scala\harjotus.scala:4:7 
+[error] 4 |import scalafx.scene.shape.Rectangle
+[error]   |       ^^^^^^^
+[error]   |       Not found: scalafx
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] -- [E006] Not Found Error: C:\Users\veikk\courses\RentingApp\src\main\scala\harjotus.scala:5:7 
+[error] 5 |import scalafx.scene.paint.Color._
+[error]   |       ^^^^^^^
+[error]   |       Not found: scalafx
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] 5 errors found
+[error] (Compile / compileIncremental) Compilation failed
+[error] Total time: 0 s, completed 6.2.2024 klo 18.08.06
+[debug] > Exec(idea-shell, None, None)

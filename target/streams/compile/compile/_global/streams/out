@@ -1,0 +1,33 @@
+[debug] Acquiring lock on file C:\Users\veikk\courses\RentingApp\project\target\.sbt-compilation-infos\root-compile\.sbt-idea-lock ...
+[error] -- [E006] Not Found Error: C:\Users\veikk\courses\RentingApp\src\main\scala\harjotus.scala:1:7 
+[error] 1 |import scalafx.application.JFXApp3
+[error]   |       ^^^^^^^
+[error]   |       Not found: scalafx
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] -- [E006] Not Found Error: C:\Users\veikk\courses\RentingApp\src\main\scala\harjotus.scala:2:7 
+[error] 2 |import scalafx.scene.Scene
+[error]   |       ^^^^^^^
+[error]   |       Not found: scalafx
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] -- [E006] Not Found Error: C:\Users\veikk\courses\RentingApp\src\main\scala\harjotus.scala:3:7 
+[error] 3 |import scalafx.scene.layout.Pane
+[error]   |       ^^^^^^^
+[error]   |       Not found: scalafx
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] -- [E006] Not Found Error: C:\Users\veikk\courses\RentingApp\src\main\scala\harjotus.scala:4:7 
+[error] 4 |import scalafx.scene.shape.Rectangle
+[error]   |       ^^^^^^^
+[error]   |       Not found: scalafx
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] -- [E006] Not Found Error: C:\Users\veikk\courses\RentingApp\src\main\scala\harjotus.scala:5:7 
+[error] 5 |import scalafx.scene.paint.Color._
+[error]   |       ^^^^^^^
+[error]   |       Not found: scalafx
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] 5 errors found
+[debug] Releasing lock on file C:\Users\veikk\courses\RentingApp\project\target\.sbt-compilation-infos\root-compile\.sbt-idea-lock.
