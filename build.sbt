@@ -7,3 +7,5 @@ lazy val root = (project in file("."))
     name := "RentingApp"
   )
 libraryDependencies += "org.scalafx" % "scalafx_3" % "20.0.0-R31"
+libraryDependencies += "org.scalatest" %% "scalatest-flatspec" % "3.2.15"
+libraryDependencies += "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.15"
