@@ -110,8 +110,17 @@ object CreateNotification extends JFXApp3:
 
           children = Array(durationLabel, maxDuration)
 
+        val submitBox = new HBox():
+          this.setAlignment(Pos.BottomRight)
+          padding = standardPadding
+          spacing = standardSpacing
+
+          val submitButton = new Button("Submit"):
+            font = Font("System", FontWeight.Bold, 15)
+          children = submitButton
+
         //children of informationBox
-        children = Array(titleBox, descriptionBox, quantityBox, priceBox, categoryBox, durationBox)
+        children = Array(titleBox, descriptionBox, quantityBox, priceBox, categoryBox, durationBox, submitBox)
 
 
       //children of root
