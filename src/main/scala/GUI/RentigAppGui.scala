@@ -89,6 +89,7 @@ object RentigAppGui extends JFXApp3:
       font = new Font(25)
 
     val categorySportBox = new HBox():
+      spacing = standardSpacing
 
       val sportLabel = new Label("Sports:")
       val sportCategories = new ChoiceBox(sports):
@@ -96,6 +97,7 @@ object RentigAppGui extends JFXApp3:
       children = Array(sportLabel, sportCategories)
 
     val categoryHomeBox = new HBox():
+      spacing = standardSpacing
 
       val homeLabel = new Label("Home:")
       val homeCategories = new ChoiceBox(home):
