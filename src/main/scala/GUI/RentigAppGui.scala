@@ -19,7 +19,7 @@ object RentigAppGui extends JFXApp3:
   val UIWidth = 800
   val UIHeight = 600
   val standardPadding = Insets.apply(10, 10, 10, 10)
-  val standardSpacing = 5
+  val standardSpacing = 10
 
   val sports = ObservableBuffer("Basketball", "Football", "Skiing", "IceHockey", "Running")
   val home = ObservableBuffer("Kitchen", "Decor", "Kids", "Outside", "Other")
@@ -38,7 +38,7 @@ object RentigAppGui extends JFXApp3:
     val leftBox = VBox()
     val rightBox = VBox()
     root.add(leftBox, 0, 0, 1, 2)
-    root.add(middleBox, 1, 0, 1, 2)
+    root.add(middleBox, 1, 1, 1, 2)
     root.add(rightBox, 2, 0, 1, 2)
 
     val column0 = new ColumnConstraints:
@@ -48,9 +48,9 @@ object RentigAppGui extends JFXApp3:
     val column2 = new ColumnConstraints:
       percentWidth = 40
     val row0 = new RowConstraints:
-      percentHeight = 50
+      percentHeight = 15
     val row1 = new RowConstraints:
-      percentHeight = 50
+      percentHeight = 85
 
     root.columnConstraints = Array(column0, column1, column2)
     root.rowConstraints = Array(row0, row1)
@@ -80,8 +80,8 @@ object RentigAppGui extends JFXApp3:
     leftBox.children = Array(leftTitle)
 
     //MiddleBox adjusting and children:
-    middleBox.padding = Insets.apply(10, 10, 10, 10)
-    middleBox.spacing = 10
+    middleBox.padding = standardPadding
+    middleBox.spacing = standardSpacing
     middleBox.setAlignment(Pos.BaselineCenter)
     middleBox.visible
 
@@ -104,6 +104,15 @@ object RentigAppGui extends JFXApp3:
 
     middleBox.children = Array(middleTitle, categorySportBox, categoryHomeBox)
 
+    //rightBox adjusting and children
+    rightBox.padding = standardPadding
+    rightBox.spacing = standardSpacing
+    rightBox.setAlignment(Pos.BaselineCenter)
+
+    val rightTitle = new Label("Your rents"):
+      font = new Font(30)
+
+    rightBox.children = Array(rightTitle)
 
     val scene = Scene(parent = root)
     stage.scene = scene
