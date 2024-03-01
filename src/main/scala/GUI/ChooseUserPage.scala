@@ -1,4 +1,5 @@
 package GUI
+package Classes
 
 import scalafx.application.JFXApp3
 import scalafx.collections.{ObservableBuffer, ObservableBufferBase}
@@ -28,11 +29,14 @@ object ChooseUserPage extends JFXApp3:
       height = UIHeight
       resizable = false
 
-    def createUser() = ???
+    def changeWindow() =
+      ???
 
     val root = new VBox():
       padding = standardPadding
       spacing = standardSpacing
+
+      def createUser(): Unit = ???
 
       val header = new HBox():
         this.setAlignment(Pos.BaselineCenter)
@@ -79,7 +83,7 @@ object ChooseUserPage extends JFXApp3:
 
         val adminButton = new Button("I'm admin")
         val accButton = new Button("Create Account"):
-          onAction = (event) => createUser()
+          onAction = (event) => changeWindow()
         children = Array(adminButton, accButton)
 
       children = Array(header, accountName, accountPhone, accountEmail, accountAddress, chooseButtons)

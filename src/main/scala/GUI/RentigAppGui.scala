@@ -116,8 +116,8 @@ object RentigAppGui extends JFXApp3:
 
     rightBox.children = Array(rightTitle)
 
-    val scene = Scene(parent = root)
-    stage.scene = scene
+    val sceneStartPage = new Scene(parent = root)
+    stage.scene = sceneStartPage
 
   end start
 end RentigAppGui
