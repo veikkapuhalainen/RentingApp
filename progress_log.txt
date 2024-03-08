@@ -1,0 +1,8 @@
+1. Sprint
+
+Made Classes Category, Notification, Rent and User and started to build GUI. Need to make changes to GUI since
+plan changed a bit from the original plan. Also I accidentally made 3 different GUI rather than one with
+3 pages. Currently I don't know how to get 3 different GUI to one but I will be working on that for next sprint.
+Classes don't have yet all methods they need to have but I will implement more methods during next sprint too.
+
+2. Sprint
