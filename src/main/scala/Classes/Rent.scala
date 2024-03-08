@@ -1,4 +1,5 @@
 package Classes
+
 import scala.collection.mutable
 
 class Rent(notification: Notification, whoRented: User, rentPrice: Double, returned: Boolean):

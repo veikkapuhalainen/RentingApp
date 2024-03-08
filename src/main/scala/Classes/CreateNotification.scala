@@ -1,17 +1,18 @@
-package GUI
+package Classes
 
+import Classes.User
 import scalafx.application.JFXApp3
 import scalafx.collections.{ObservableBuffer, ObservableBufferBase}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.control.{Button, ChoiceBox, Label, Separator, TextArea, TextField}
+import scalafx.scene.control.*
 import scalafx.scene.effect.BlendMode.{Green, Red}
-import scalafx.scene.layout.{Background, ColumnConstraints, GridPane, HBox, Pane, RowConstraints, VBox}
+import scalafx.scene.layout.*
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color.White
-import scalafx.scene.text.{Font, FontWeight}
 import scalafx.scene.text.FontWeight.Black
+import scalafx.scene.text.{Font, FontWeight}
 
 object CreateNotification extends JFXApp3:
 
@@ -51,7 +52,7 @@ object CreateNotification extends JFXApp3:
 
           val titleLabel = new Label("Title:")
           val titleTxtField = new TextField():
-            promptText = "Title of your product"
+            promptText = "Name of your product"
           children = Array(titleLabel, titleTxtField)
 
         val descriptionBox = new HBox():
@@ -117,6 +118,7 @@ object CreateNotification extends JFXApp3:
 
           val submitButton = new Button("Submit"):
             font = Font("System", FontWeight.Bold, 15)
+            //onAction = (event) => createNewNotification(information) *created a new notification*
           children = submitButton
 
         //children of informationBox

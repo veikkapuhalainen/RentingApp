@@ -1,31 +1,33 @@
-package GUI
 package Classes
 
+import Classes.User
 import scalafx.application.JFXApp3
+import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.collections.{ObservableBuffer, ObservableBufferBase}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.control.{Button, ChoiceBox, Label, Separator}
+import scalafx.scene.control.*
 import scalafx.scene.effect.BlendMode.{Green, Red}
-import scalafx.scene.layout.{Background, ColumnConstraints, GridPane, HBox, Pane, RowConstraints, VBox}
+import scalafx.scene.layout.*
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color.White
-import scalafx.scene.text.{Font, FontWeight}
 import scalafx.scene.text.FontWeight.Black
+import scalafx.scene.text.{Font, FontWeight}
 
 object RentigAppGui extends JFXApp3:
 
   val UIWidth = 800
   val UIHeight = 600
   val standardPadding = Insets.apply(10, 10, 10, 10)
-  val standardSpacing = 10
+  val standardSpacing = 15
 
   val sports = ObservableBuffer("Basketball", "Football", "Skiing", "IceHockey", "Running")
   val home = ObservableBuffer("Kitchen", "Decor", "Kids", "Outside", "Other")
-
+  val categories = sports ++ home
+  
   def start() =
-    stage = new JFXApp3.PrimaryStage:
+    val stage = new JFXApp3.PrimaryStage:
       title = "Renting App"
       width = UIWidth
       height = UIHeight
@@ -34,31 +36,26 @@ object RentigAppGui extends JFXApp3:
     val root = GridPane()
 
     //Dividing screen to 3 Vboxes
-    val middleBox = VBox()
-    val leftBox = VBox()
     val rightBox = VBox()
+    val leftBox = VBox()
     root.add(leftBox, 0, 0, 1, 2)
-    root.add(middleBox, 1, 1, 1, 2)
-    root.add(rightBox, 2, 0, 1, 2)
+    root.add(rightBox, 1, 0, 1, 2)
 
     val column0 = new ColumnConstraints:
-      percentWidth = 40
-    val column1 = new ColumnConstraints:
       percentWidth = 20
-    val column2 = new ColumnConstraints:
-      percentWidth = 40
+    val column1 = new ColumnConstraints:
+      percentWidth = 80
     val row0 = new RowConstraints:
       percentHeight = 15
     val row1 = new RowConstraints:
       percentHeight = 85
 
-    root.columnConstraints = Array(column0, column1, column2)
+    root.columnConstraints = Array(column0, column1)
     root.rowConstraints = Array(row0, row1)
 
     // filling colors for testing purpose
     leftBox.background = Background.fill(Color.White)
-    middleBox.background = Background.fill(Color.LightBlue)
-    rightBox.background = Background.fill(Color.LightGreen)
+    rightBox.background = Background.fill(Color.LightBlue)
 
 
     //LeftBox adjusting and children:
@@ -66,8 +63,17 @@ object RentigAppGui extends JFXApp3:
     leftBox.spacing = standardSpacing
     leftBox.setAlignment(Pos.BaselineCenter)
 
-    val leftTitle = new Label("For Rent"):
-      font = new Font(30)
+    val productsTitle = new Label("Products"):
+      font = new Font(25)
+    val allProducts = new Button("All products"):
+      font = new Font(10)
+    val availableBut = new Button("Available"):
+      font = new Font(10)
+    val reservedBut = new Button("Reserved"):
+      font = new Font(10)
+    val newNotificationLabel = new Label("Add new notification")
+    val addNotification = new Button("Add")
+      //onAction = (event) => *changes page to createnotificationpage
 
     //Buttons for sorting the notifications
    /* val sortedByPublication = new Button("By publication")
@@ -77,17 +83,16 @@ object RentigAppGui extends JFXApp3:
     //notifications downloaded from files
     val notifications = Array("**Notifications**")
 
-    leftBox.children = Array(leftTitle)
+    leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification)
 
     //MiddleBox adjusting and children:
-    middleBox.padding = standardPadding
-    middleBox.spacing = standardSpacing
-    middleBox.setAlignment(Pos.BaselineCenter)
-    middleBox.visible
+    rightBox.padding = standardPadding
+    rightBox.spacing = standardSpacing
+    rightBox.setAlignment(Pos.BaselineCenter)
 
     val middleTitle = new Label("Categories"):
       font = new Font(25)
-
+/*
     val categorySportBox = new HBox():
       spacing = standardSpacing
 
@@ -104,20 +109,23 @@ object RentigAppGui extends JFXApp3:
         value = home(0)
       children = Array(homeLabel, homeCategories)
 
-    middleBox.children = Array(middleTitle, categorySportBox, categoryHomeBox)
+ */
+
+    rightBox.children = Array(middleTitle) //, categorySportBox, categoryHomeBox)
+
 
     //rightBox adjusting and children
     rightBox.padding = standardPadding
     rightBox.spacing = standardSpacing
     rightBox.setAlignment(Pos.BaselineCenter)
 
-    val rightTitle = new Label("Your rents"):
-      font = new Font(30)
+    val rightTitle = new Label("Click products you are interested in"):
+      font = new Font(25)
 
     rightBox.children = Array(rightTitle)
 
-    val sceneStartPage = new Scene(parent = root)
-    stage.scene = sceneStartPage
+    val scene = new Scene(parent = root)
+    stage.scene = scene
+
 
   end start
-end RentigAppGui

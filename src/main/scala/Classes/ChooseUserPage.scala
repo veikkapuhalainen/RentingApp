@@ -1,18 +1,18 @@
-package GUI
 package Classes
 
+//import Classes.User
 import scalafx.application.JFXApp3
 import scalafx.collections.{ObservableBuffer, ObservableBufferBase}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.control.{Button, ChoiceBox, Label, Separator, TextField}
+import scalafx.scene.control.*
 import scalafx.scene.effect.BlendMode.{Green, Red}
-import scalafx.scene.layout.{Background, ColumnConstraints, GridPane, HBox, Pane, RowConstraints, VBox}
+import scalafx.scene.layout.*
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color.White
-import scalafx.scene.text.{Font, FontWeight}
 import scalafx.scene.text.FontWeight.Black
+import scalafx.scene.text.{Font, FontWeight}
 
 object ChooseUserPage extends JFXApp3:
 
@@ -83,7 +83,7 @@ object ChooseUserPage extends JFXApp3:
 
         val adminButton = new Button("I'm admin")
         val accButton = new Button("Create Account"):
-          onAction = (event) => changeWindow()
+          onAction = (event) => createUser()
         children = Array(adminButton, accButton)
 
       children = Array(header, accountName, accountPhone, accountEmail, accountAddress, chooseButtons)
