@@ -3,6 +3,7 @@ package Classes
 import Classes.User
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
+import scalafx.beans.property.ObjectProperty
 import scalafx.collections.{ObservableBuffer, ObservableBufferBase}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
@@ -15,6 +16,8 @@ import scalafx.scene.paint.Color.White
 import scalafx.scene.text.FontWeight.Black
 import scalafx.scene.text.{Font, FontWeight}
 
+import scala.collection.mutable.ListBuffer
+
 object RentigAppGui extends JFXApp3:
 
   val UIWidth = 800
@@ -22,10 +25,14 @@ object RentigAppGui extends JFXApp3:
   val standardPadding = Insets.apply(10, 10, 10, 10)
   val standardSpacing = 15
 
-  val sports = ObservableBuffer("Basketball", "Football", "Skiing", "IceHockey", "Running")
+  val sports = ObservableBuffer("Cycling" ,"Basketball", "Football", "Skiing", "IceHockey", "Running")
   val home = ObservableBuffer("Kitchen", "Decor", "Kids", "Outside", "Other")
   val categories = sports ++ home
-  
+
+  var allNotifications = ObjectProperty(ListBuffer[Notification]())
+  var availableNotifications = ObjectProperty(ListBuffer[Notification]())
+  var reservedNotifications = ObjectProperty(ListBuffer[Notification]())
+
   def start() =
     val stage = new JFXApp3.PrimaryStage:
       title = "Renting App"
@@ -35,7 +42,7 @@ object RentigAppGui extends JFXApp3:
 
     val root = GridPane()
 
-    //Dividing screen to 3 Vboxes
+    //Dividing screen to 2 Vboxes
     val rightBox = VBox()
     val leftBox = VBox()
     root.add(leftBox, 0, 0, 1, 2)
@@ -73,7 +80,7 @@ object RentigAppGui extends JFXApp3:
       font = new Font(10)
     val newNotificationLabel = new Label("Add new notification")
     val addNotification = new Button("Add")
-      //onAction = (event) => *changes page to createnotificationpage
+     // onAction = (event) => CreateNotification.start() //*changes page to createnotificationpage
 
     //Buttons for sorting the notifications
    /* val sortedByPublication = new Button("By publication")
