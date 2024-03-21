@@ -2,6 +2,7 @@ package Classes
 
 import Classes.User
 import Classes.CreateNotification.{categories, standardPadding, standardSpacing}
+import Classes.RentigAppGui
 import scalafx.geometry.Pos
 import scalafx.scene.control.{Button, ChoiceBox, Label, TextArea, TextField}
 import scalafx.scene.layout.{HBox, VBox}
@@ -71,15 +72,15 @@ class InformationBox(parentWidth: Int, parentHeight: Int) extends VBox:
     spacing = standardSpacing
     children = Array(categoryLabel, category)
 
-  val durationBox = new HBox():
-    padding = standardPadding
-    spacing = standardSpacing
 
-    val durationLabel = new Label("Set max duration (days) for renting this product:")
-    val maxDuration = new TextField():
+  val durationLabel = new Label("Set max duration (days) for renting this product:")
+  val maxDuration = new TextField():
       promptText = "max"
       prefWidth = 50
 
+  val durationBox = new HBox():
+    padding = standardPadding
+    spacing = standardSpacing
     children = Array(durationLabel, maxDuration)
 
 

@@ -1,6 +1,7 @@
 package Classes
 
 import Classes.User
+import Classes.InformationBox
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.beans.property.ObjectProperty
@@ -80,7 +81,7 @@ object RentigAppGui extends JFXApp3:
       font = new Font(10)
     val newNotificationLabel = new Label("Add new notification")
     val addNotification = new Button("Add")
-     // onAction = (event) => CreateNotification.start() //*changes page to createnotificationpage
+    //onAction = (event) => scene.root = view2
 
     //Buttons for sorting the notifications
    /* val sortedByPublication = new Button("By publication")
@@ -115,7 +116,6 @@ object RentigAppGui extends JFXApp3:
       val homeCategories = new ChoiceBox(home):
         value = home(0)
       children = Array(homeLabel, homeCategories)
-
  */
 
     rightBox.children = Array(middleTitle) //, categorySportBox, categoryHomeBox)
@@ -131,8 +131,27 @@ object RentigAppGui extends JFXApp3:
 
     rightBox.children = Array(rightTitle)
 
+
     val scene = new Scene(parent = root)
     stage.scene = scene
 
-
   end start
+
+
+
+///*
+  val view2 = new VBox():
+    padding = standardPadding
+    spacing = standardSpacing
+
+    val header = new HBox():
+      padding = standardPadding
+      this.setAlignment(Pos.BaselineCenter)
+
+      val headerLabel = new Label("Please fill the fields below regarding your product"):
+        font = new Font(15)
+      children = headerLabel
+
+    children = Array(header, InformationBox(UIWidth, UIHeight))
+   // */
+

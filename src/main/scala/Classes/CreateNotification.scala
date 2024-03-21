@@ -21,6 +21,7 @@ object CreateNotification extends JFXApp3:
   val standardPadding = Insets.apply(10, 10, 10, 10)
   val standardSpacing = 10
 
+
   val sports = ObservableBuffer(Category("Basketball"), Category("Football"), Category("Skiing"), Category("IceHockey"), Category("Running"))
   val home = ObservableBuffer(Category("Kitchen"), Category("Decor"), Category("Kids"), Category("Outside"), Category("Other"))
   val categories = sports ++ home
@@ -33,7 +34,9 @@ object CreateNotification extends JFXApp3:
       height = UIHeight
       resizable = false
 
-    val root = new VBox():
+
+
+    val view2 = new VBox():
       padding = standardPadding
       spacing = standardSpacing
 
@@ -47,5 +50,6 @@ object CreateNotification extends JFXApp3:
 
       children = Array(header, InformationBox(UIWidth, UIHeight))
 
-    val scene = Scene(parent = root)
+    val scene = Scene(parent = view2)
     stage.scene = scene
+
