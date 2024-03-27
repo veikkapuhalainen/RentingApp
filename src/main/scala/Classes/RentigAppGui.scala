@@ -32,7 +32,7 @@ object RentigAppGui extends JFXApp3:
   val home = ObservableBuffer(Category("Kitchen"), Category("Decor"), Category("Kids"), Category("Outside"), Category("Other"))
   val categories = sports ++ home
 
-  val alphabets = Array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö')
+  val alphabets = Array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','å','ä','ö')
 
   var allNotifications = ObjectProperty(ListBuffer[Notification]())
   var availableNotifications = ObjectProperty(ListBuffer[Notification]())
@@ -82,16 +82,22 @@ object RentigAppGui extends JFXApp3:
       font = new Font(25)
     val allProducts = new Button("All products"):
       font = new Font(10)
+      //onAction = (event) => *show all products*
     val availableBut = new Button("Available"):
       font = new Font(10)
+      //onAction = (event) => *show currently available products*
     val reservedBut = new Button("Reserved"):
       font = new Font(10)
+      //onAction = (event) => *show currently reserved products*
     val newNotificationLabel = new Label("Add new notification")
+
+    val addNotification = new Button("Add")
 
     val view2 = new VBox():
       padding = standardPadding
       spacing = standardSpacing
 
+    //InformationBox of product for creating new notification
     val header = new HBox():
       padding = standardPadding
       this.setAlignment(Pos.BaselineCenter)
@@ -99,8 +105,6 @@ object RentigAppGui extends JFXApp3:
     val headerLabel = new Label("Please fill the fields below regarding your product")
     headerLabel.font = new Font(15)
     header.children = headerLabel
-
-  //  class InformationBox(parentWidth: Int, parentHeight: Int) extends VBox:
 
     val titleLabel = new Label("Title:")
     val titleTxtField = new TextField():
@@ -155,8 +159,7 @@ object RentigAppGui extends JFXApp3:
       padding = standardPadding
       spacing = standardSpacing
       children = Array(categoryLabel, category)
-
-
+/*
     val durationLabel = new Label("Set max duration (days) for renting this product:")
     val maxDuration = new TextField():
       promptText = "max"
@@ -167,7 +170,8 @@ object RentigAppGui extends JFXApp3:
       spacing = standardSpacing
       children = Array(durationLabel, maxDuration)
 
-
+ */
+    // users informations when creating a new notification
     val nameLabel = new Label("Your name:")
     val createrName = new TextField():
       promptText = "Name"
@@ -215,23 +219,28 @@ object RentigAppGui extends JFXApp3:
       for i <- 0 until hourPrice.length do
         if alphabets.contains(hourPrice(i).toLower) then
           inCorrectValues = true
+      for i <- 0 until phone.length do
+        if alphabets.contains(phone(i).toLower) then
+          inCorrectValues = true
 
       if missingValues then
         val missingAlert = new Alert(AlertType.Error):
           title = "Missing Information"
           headerText = "Remember to fill all information"
+          contentText = "You haven't filled all fields"
           showAndWait()
       else if inCorrectValues then
         val inCorrectAlert = new Alert(AlertType.Error):
           title = "Incorrect Information"
           headerText = "Please fill informations correct"
+          contentText = "You have input characters to fields in which you shouldn't"
           showAndWait()
       else
         val creator = User(name, address, phone)
         val notif = creator.makeNotification(ptitle, dayPrice.toDouble, hourPrice.toDouble, desc, category.value.value)
 
         allNotifications.setValue(allNotifications.value :+ notif)
-        FileReader(notif)
+        WriteToFile(notif)
         rightBox.children += NotificationPanel(notif, seeMoreButton)
         scene1.root = view1
     end createNewNotification
@@ -243,10 +252,8 @@ object RentigAppGui extends JFXApp3:
         headerText = notification.name
         contentText = notification.description
       alert.showAndWait()
-
     */
-
-
+   
     val submitButton = new Button("Submit")
     submitButton.font = Font("System", FontWeight.Bold, 15)
     submitButton.onAction = (event) =>
@@ -255,13 +262,10 @@ object RentigAppGui extends JFXApp3:
     val submitBox = new HBox():
       this.setAlignment(Pos.BottomRight)
       children = submitButton
-    //children of informationBox
-   // children = Array(titleBox, descriptionBox, quantityBox, priceBox, categoryBox, durationBox, createrBoxHeader, createrBox, submitBox)
 
-    view2.children = Array(header, titleBox, descriptionBox, quantityBox, priceBox, categoryBox, durationBox, new Separator, createrBoxHeader, createrBox, submitBox)
+    view2.children = Array(header, titleBox, descriptionBox, quantityBox, priceBox, categoryBox, new Separator, createrBoxHeader, createrBox, submitBox)
 
-    val addNotification = new Button("Add"):
-      onAction = (event) => scene1.root = view2
+    addNotification.onAction = (event) => scene1.root = view2
 
     leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification)
 
@@ -272,25 +276,8 @@ object RentigAppGui extends JFXApp3:
 
     val middleTitle = new Label("Categories"):
       font = new Font(25)
-/*
-    val categorySportBox = new HBox():
-      spacing = standardSpacing
 
-      val sportLabel = new Label("Sports:")
-      val sportCategories = new ChoiceBox(sports):
-        value = sports(0)
-      children = Array(sportLabel, sportCategories)
-
-    val categoryHomeBox = new HBox():
-      spacing = standardSpacing
-
-      val homeLabel = new Label("Home:")
-      val homeCategories = new ChoiceBox(home):
-        value = home(0)
-      children = Array(homeLabel, homeCategories)
- */
-
-    rightBox.children = Array(middleTitle) //, categorySportBox, categoryHomeBox)
+    rightBox.children = Array(middleTitle)
 
 
     //rightBox adjusting and children
@@ -300,17 +287,7 @@ object RentigAppGui extends JFXApp3:
 
     val rightTitle = new Label("Click products you are interested in"):
       font = new Font(25)
-
-    //adding notifications to rightBox
-
-    val notifications = this.allNotifications
-
+    
     rightBox.children = Array(rightTitle)
 
     stage.scene = scene1
-
-
-
-
-
-  end start

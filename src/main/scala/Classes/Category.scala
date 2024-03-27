@@ -2,7 +2,7 @@ package Classes
 
 import scala.collection.mutable
  
-class Category(val categoryName: String):
+case class Category(val categoryName: String):
 
   val subCategories = mutable.Buffer[Category]()
 

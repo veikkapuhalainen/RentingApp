@@ -75,8 +75,8 @@ class InformationBox(parentWidth: Int, parentHeight: Int) extends VBox:
 
   val durationLabel = new Label("Set max duration (days) for renting this product:")
   val maxDuration = new TextField():
-      promptText = "max"
-      prefWidth = 50
+    promptText = "max"
+    prefWidth = 50
 
   val durationBox = new HBox():
     padding = standardPadding
@@ -115,9 +115,10 @@ class InformationBox(parentWidth: Int, parentHeight: Int) extends VBox:
     padding = standardPadding
     spacing = standardSpacing
 
-    val submitButton = new Button("Submit"):
-      font = Font("System", FontWeight.Bold, 15)
-      onAction = (event) => createNewNotification()
+    val submitButton = new Button("Submit")
+    submitButton.font = Font("System", FontWeight.Bold, 15)
+    submitButton.onAction = (event) => createNewNotification()
+     //get back to windowwwwe
     children = submitButton
 
   //children of informationBox

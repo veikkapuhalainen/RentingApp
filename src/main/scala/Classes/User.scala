@@ -2,7 +2,7 @@ package Classes
 
 import scala.collection.mutable
 
-class User(val name: String, val address: String, val phoneNumber: String):
+case class User(val name: String, val address: String, val phoneNumber: String):
 
 
   val notifications = mutable.Buffer[Notification]()

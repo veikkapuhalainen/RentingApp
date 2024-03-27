@@ -2,14 +2,11 @@ package Classes
 
 import scala.collection.mutable
 
-class Notification(var name: String, var publisher: User, var pricePerDay: Double, var pricePerHour: Double, var description: String, val category: Category):
+case class Notification(name: String, publisher: User, pricePerDay: Double, pricePerHour: Double, description: String, category: Category):
+
 
   val comments = mutable.Buffer[String]()
   val damages = mutable.Buffer[String]()
-/*
-  val reserved = Buffer[TimePeriod]()
-  val calendar =  Calendar
-  */
 
   def addComment(description: String): Unit =
     this.comments += description
