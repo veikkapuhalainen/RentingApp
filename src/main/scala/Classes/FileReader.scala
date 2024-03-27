@@ -21,4 +21,5 @@ class FileReader(n: Notification):
   writer.write(notifJsonString + "\n" + "\n")
   writer.close()
 
+
 end FileReader
