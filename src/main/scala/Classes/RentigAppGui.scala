@@ -2,6 +2,7 @@ package Classes
 
 import Classes.User
 import Classes.InformationBox
+import Classes.NotificationPanel
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.beans.property.ObjectProperty
@@ -10,6 +11,7 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.control.*
+import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.effect.BlendMode.{Green, Red}
 import scalafx.scene.layout.*
 import scalafx.scene.paint.Color
@@ -23,12 +25,14 @@ object RentigAppGui extends JFXApp3:
 
   val UIWidth = 800
   val UIHeight = 600
-  val standardPadding = Insets.apply(10, 10, 10, 10)
-  val standardSpacing = 15
+  val standardPadding = Insets.apply(5, 5, 5, 5)
+  val standardSpacing = 10
 
-  val sports = ObservableBuffer("Cycling" ,"Basketball", "Football", "Skiing", "IceHockey", "Running")
-  val home = ObservableBuffer("Kitchen", "Decor", "Kids", "Outside", "Other")
+  val sports = ObservableBuffer(Category("Basketball"), Category("Football"), Category("Skiing"), Category("IceHockey"), Category("Running"))
+  val home = ObservableBuffer(Category("Kitchen"), Category("Decor"), Category("Kids"), Category("Outside"), Category("Other"))
   val categories = sports ++ home
+
+  val alphabets = Array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö')
 
   var allNotifications = ObjectProperty(ListBuffer[Notification]())
   var availableNotifications = ObjectProperty(ListBuffer[Notification]())
@@ -41,13 +45,16 @@ object RentigAppGui extends JFXApp3:
       height = UIHeight
       resizable = false
 
-    val root = GridPane()
+    val view1 = GridPane()
+
+    val scene1 = new Scene(parent = view1)
+
 
     //Dividing screen to 2 Vboxes
     val rightBox = VBox()
     val leftBox = VBox()
-    root.add(leftBox, 0, 0, 1, 2)
-    root.add(rightBox, 1, 0, 1, 2)
+    view1.add(leftBox, 0, 0, 1, 2)
+    view1.add(rightBox, 1, 0, 1, 2)
 
     val column0 = new ColumnConstraints:
       percentWidth = 20
@@ -58,8 +65,8 @@ object RentigAppGui extends JFXApp3:
     val row1 = new RowConstraints:
       percentHeight = 85
 
-    root.columnConstraints = Array(column0, column1)
-    root.rowConstraints = Array(row0, row1)
+    view1.columnConstraints = Array(column0, column1)
+    view1.rowConstraints = Array(row0, row1)
 
     // filling colors for testing purpose
     leftBox.background = Background.fill(Color.White)
@@ -80,20 +87,185 @@ object RentigAppGui extends JFXApp3:
     val reservedBut = new Button("Reserved"):
       font = new Font(10)
     val newNotificationLabel = new Label("Add new notification")
-    val addNotification = new Button("Add")
-    //onAction = (event) => scene.root = view2
 
-    //Buttons for sorting the notifications
-   /* val sortedByPublication = new Button("By publication")
-    val sortedByCategory = new ChoiceBox(categories):
-      value = categories(0)*/
+    val view2 = new VBox():
+      padding = standardPadding
+      spacing = standardSpacing
 
-    //notifications downloaded from files
-    val notifications = Array("**Notifications**")
+    val header = new HBox():
+      padding = standardPadding
+      this.setAlignment(Pos.BaselineCenter)
+
+    val headerLabel = new Label("Please fill the fields below regarding your product")
+    headerLabel.font = new Font(15)
+    header.children = headerLabel
+
+  //  class InformationBox(parentWidth: Int, parentHeight: Int) extends VBox:
+
+    val titleLabel = new Label("Title:")
+    val titleTxtField = new TextField():
+      promptText = "Name of your product"
+
+    val titleBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing * 5
+      children = Array(titleLabel, titleTxtField)
+
+    val descLabel = new Label("Description:")
+    val descTxtArea = new TextArea():
+      promptText = "Tell something about your product"
+
+    val descriptionBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+      children = Array(descLabel, descTxtArea)
+
+    val quantityBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing*3
+
+      val quantityLabel = new Label("Quantity:")
+      val quantityTxt = new TextField():
+        promptText = "1,2..."
+        prefWidth = 50
+
+      children = Array(quantityLabel, quantityTxt)
+
+    val priceLabelDay = new Label("Price per day:")
+    val priceTxtFieldDay = new TextField():
+      promptText = "€"
+      prefWidth = 50
+
+    val priceLabelHour = new Label("Price per hour:")
+    val priceTxtFieldhour = new TextField():
+      promptText = "€"
+      prefWidth = 50
+
+    val priceBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+      children = Array(priceLabelDay, priceTxtFieldDay, priceLabelHour, priceTxtFieldhour)
+
+
+    val categoryLabel = new Label("Choose category:")
+    val category = new ChoiceBox[Category](categories):
+      value = categories(0)
+
+    val categoryBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+      children = Array(categoryLabel, category)
+
+
+    val durationLabel = new Label("Set max duration (days) for renting this product:")
+    val maxDuration = new TextField():
+      promptText = "max"
+      prefWidth = 50
+
+    val durationBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+      children = Array(durationLabel, maxDuration)
+
+
+    val nameLabel = new Label("Your name:")
+    val createrName = new TextField():
+      promptText = "Name"
+
+    val addressLabel = new Label("Address:")
+    val createrAddress = new TextField():
+      promptText = "Address"
+
+    val phoneLabel = new Label("Phone number:")
+    val createrPhone = new TextField()
+    createrPhone.promptText = "Phone nro"
+
+    val createrBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+
+      children = Array(nameLabel, createrName, addressLabel, createrAddress, phoneLabel, createrPhone)
+
+    val createrBoxHeader = new HBox():
+      padding = standardPadding
+      this.setAlignment(Pos.BaselineCenter)
+
+      val header = new Label("Please fill the fields below regarding you"):
+        font = new Font(15)
+      children = header
+
+    val seeMoreButton = new Button("See more")
+
+    def createNewNotification(): Unit =
+      // product info
+      val ptitle = titleTxtField.text.value
+      val dayPrice = priceTxtFieldDay.text.value
+      val hourPrice = priceTxtFieldhour.text.value
+      val desc = descTxtArea.text.value
+      // user info
+      val name = createrName.text.value
+      val address =  createrAddress.text.value
+      val phone =  createrPhone.text.value
+      //checking incorrect inputs
+      val missingValues: Boolean = ptitle == "" || dayPrice == "" || hourPrice == "" || desc == "" || name == "" || address == "" || phone == ""
+      var inCorrectValues: Boolean = false
+      for i <- 0 until dayPrice.length do
+        if alphabets.contains(dayPrice(i).toLower) then
+          inCorrectValues = true
+      for i <- 0 until hourPrice.length do
+        if alphabets.contains(hourPrice(i).toLower) then
+          inCorrectValues = true
+
+      if missingValues then
+        val missingAlert = new Alert(AlertType.Error):
+          title = "Missing Information"
+          headerText = "Remember to fill all information"
+          showAndWait()
+      else if inCorrectValues then
+        val inCorrectAlert = new Alert(AlertType.Error):
+          title = "Incorrect Information"
+          headerText = "Please fill informations correct"
+          showAndWait()
+      else
+        val creator = User(name, address, phone)
+        val notif = creator.makeNotification(ptitle, dayPrice.toDouble, hourPrice.toDouble, desc, category.value.value)
+
+        allNotifications.setValue(allNotifications.value :+ notif)
+        FileReader(notif)
+        rightBox.children += NotificationPanel(notif, seeMoreButton)
+        scene1.root = view1
+    end createNewNotification
+
+   /*
+    def notificationClick(notification: Notification) =
+      val alert = new Alert(AlertType.Information):
+        title = "Product's information"
+        headerText = notification.name
+        contentText = notification.description
+      alert.showAndWait()
+
+    */
+
+
+    val submitButton = new Button("Submit")
+    submitButton.font = Font("System", FontWeight.Bold, 15)
+    submitButton.onAction = (event) =>
+      createNewNotification()
+
+    val submitBox = new HBox():
+      this.setAlignment(Pos.BottomRight)
+      children = submitButton
+    //children of informationBox
+   // children = Array(titleBox, descriptionBox, quantityBox, priceBox, categoryBox, durationBox, createrBoxHeader, createrBox, submitBox)
+
+    view2.children = Array(header, titleBox, descriptionBox, quantityBox, priceBox, categoryBox, durationBox, new Separator, createrBoxHeader, createrBox, submitBox)
+
+    val addNotification = new Button("Add"):
+      onAction = (event) => scene1.root = view2
 
     leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification)
 
-    //MiddleBox adjusting and children:
+    //RightBox adjusting and children:
     rightBox.padding = standardPadding
     rightBox.spacing = standardSpacing
     rightBox.setAlignment(Pos.BaselineCenter)
@@ -129,29 +301,16 @@ object RentigAppGui extends JFXApp3:
     val rightTitle = new Label("Click products you are interested in"):
       font = new Font(25)
 
+    //adding notifications to rightBox
+
+    val notifications = this.allNotifications
+
     rightBox.children = Array(rightTitle)
 
+    stage.scene = scene1
 
-    val scene = new Scene(parent = root)
-    stage.scene = scene
+
+
+
 
   end start
-
-
-
-///*
-  val view2 = new VBox():
-    padding = standardPadding
-    spacing = standardSpacing
-
-    val header = new HBox():
-      padding = standardPadding
-      this.setAlignment(Pos.BaselineCenter)
-
-      val headerLabel = new Label("Please fill the fields below regarding your product"):
-        font = new Font(15)
-      children = headerLabel
-
-    children = Array(header, InformationBox(UIWidth, UIHeight))
-   // */
-
