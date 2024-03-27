@@ -42,7 +42,7 @@ object RentigAppGui extends JFXApp3:
   val home = ObservableBuffer(Category("Kitchen"), Category("Decor"), Category("Kids"), Category("Outside"), Category("Other"))
   val categories = sports ++ home
 
-  val alphabets = Array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','å','ä','ö')
+  val correctChars = Array('0','1','2','3','4','5','6','7','8','9')//('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','å','ä','ö')
 
   var allNotifications = ObjectProperty(ListBuffer[Notification]())
   var availableNotifications = ObjectProperty(ListBuffer[Notification]())
@@ -170,29 +170,6 @@ object RentigAppGui extends JFXApp3:
       padding = standardPadding
       spacing = standardSpacing
       children = Array(categoryLabel, category)
-
-
-    def readFromFile(notificationName: String): Option[Notification] =
-      val source = Source.fromFile("jsonFile.txt")
-      val jsonString =
-        try
-          source.mkString
-        catch
-          case error: Error => throw Exception().getCause
-        end try
-        source.close()
-
-      val notifications: Array[Notification] =
-        decode[Array[Notification]](jsonString.asJson.spaces2) match
-          case Right(value) => value
-          case Left(error) => throw error
-
-      notifications.find(_.name == notificationName)
-
-
-
-
-
 /*
     val durationLabel = new Label("Set max duration (days) for renting this product:")
     val maxDuration = new TextField():
@@ -253,13 +230,13 @@ object RentigAppGui extends JFXApp3:
       val missingValues: Boolean = ptitle == "" || dayPrice == "" || hourPrice == "" || desc == "" || name == "" || address == "" || phone == ""
       var inCorrectValues: Boolean = false
       for i <- 0 until dayPrice.length do
-        if alphabets.contains(dayPrice(i).toLower) then
+        if !(correctChars.contains(dayPrice(i))) then
           inCorrectValues = true
       for i <- 0 until hourPrice.length do
-        if alphabets.contains(hourPrice(i).toLower) then
+        if !(correctChars.contains(hourPrice(i))) then
           inCorrectValues = true
       for i <- 0 until phone.length do
-        if alphabets.contains(phone(i).toLower) then
+        if !(correctChars.contains(phone(i))) then
           inCorrectValues = true
 
       if missingValues then
@@ -298,9 +275,12 @@ object RentigAppGui extends JFXApp3:
     submitButton.onAction = (event) =>
       createNewNotification()
 
+    val cancelButton = new Button("Cancel")
+    cancelButton.onAction = (event) => scene1.root = view1
+
     val submitBox = new HBox():
-      this.setAlignment(Pos.BottomRight)
-      children = submitButton
+      spacing = standardSpacing * 65
+      children = Array(cancelButton, submitButton)
 
     leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification, seeMoreButton)
 
@@ -415,13 +395,13 @@ object RentigAppGui extends JFXApp3:
     rentButton.font = Font("System", FontWeight.Bold, 15)
   //  rentButton.onAction = (event) => *make a rent*
 
-    val cancelButton = new Button("Cancel")
-    cancelButton.onAction = (event) => scene1.root = view1
+    val rentCancelButton = new Button("Cancel")
+    rentCancelButton.onAction = (event) => scene1.root = view1
 
     val rentButtonBox = new HBox():
       padding = Insets.apply(30,5,5,5)
       spacing = standardSpacing * 60
-      children = Array(cancelButton, rentButton)
+      children = Array(rentCancelButton, rentButton)
 
     view3.children = Array(rentHeader, rentTitleBox, rentDescriptionBox, rentQuantityBox, rentPriceBox, rentCategoryBox,
       new Separator, renterBoxHeader, renterBox, new Separator, rentButtonBox)
