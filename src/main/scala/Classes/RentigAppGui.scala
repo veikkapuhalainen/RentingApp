@@ -3,6 +3,8 @@ package Classes
 import Classes.User
 import Classes.InformationBox
 import Classes.NotificationPanel
+import io.circe.Error
+import io.circe.parser.decode
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.beans.property.ObjectProperty
@@ -20,6 +22,14 @@ import scalafx.scene.text.FontWeight.Black
 import scalafx.scene.text.{Font, FontWeight}
 
 import scala.collection.mutable.ListBuffer
+import io.circe.generic.auto.*
+import cats.syntax.either.*
+import io.circe.*
+import io.circe.parser.*
+import io.circe.syntax.*
+import io.circe.generic.auto.*
+import scala.io.Source
+import java.io.{BufferedWriter, File, FileWriter}
 
 object RentigAppGui extends JFXApp3:
 
@@ -93,6 +103,7 @@ object RentigAppGui extends JFXApp3:
 
     val addNotification = new Button("Add")
 
+    //Creating notification page
     val view2 = new VBox():
       padding = standardPadding
       spacing = standardSpacing
@@ -159,6 +170,29 @@ object RentigAppGui extends JFXApp3:
       padding = standardPadding
       spacing = standardSpacing
       children = Array(categoryLabel, category)
+
+
+    def readFromFile(notificationName: String): Option[Notification] =
+      val source = Source.fromFile("jsonFile.txt")
+      val jsonString =
+        try
+          source.mkString
+        catch
+          case error: Error => throw Exception().getCause
+        end try
+        source.close()
+
+      val notifications: Array[Notification] =
+        decode[Array[Notification]](jsonString.asJson.spaces2) match
+          case Right(value) => value
+          case Left(error) => throw error
+
+      notifications.find(_.name == notificationName)
+
+
+
+
+
 /*
     val durationLabel = new Label("Set max duration (days) for renting this product:")
     val maxDuration = new TextField():
@@ -198,7 +232,12 @@ object RentigAppGui extends JFXApp3:
         font = new Font(15)
       children = header
 
+    val view3 = new VBox():
+      padding = standardPadding
+      spacing = standardSpacing
+
     val seeMoreButton = new Button("See more")
+    seeMoreButton.onAction = (event) => scene1.root = view3
 
     def createNewNotification(): Unit =
       // product info
@@ -241,7 +280,7 @@ object RentigAppGui extends JFXApp3:
 
         allNotifications.setValue(allNotifications.value :+ notif)
         WriteToFile(notif)
-        rightBox.children += NotificationPanel(notif, seeMoreButton)
+        //rightBox.children += NotificationPanel(notif, seeMoreButton)
         scene1.root = view1
     end createNewNotification
 
@@ -263,11 +302,12 @@ object RentigAppGui extends JFXApp3:
       this.setAlignment(Pos.BottomRight)
       children = submitButton
 
+    leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification, seeMoreButton)
+
     view2.children = Array(header, titleBox, descriptionBox, quantityBox, priceBox, categoryBox, new Separator, createrBoxHeader, createrBox, submitBox)
 
     addNotification.onAction = (event) => scene1.root = view2
 
-    leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification)
 
     //RightBox adjusting and children:
     rightBox.padding = standardPadding
@@ -288,6 +328,100 @@ object RentigAppGui extends JFXApp3:
     val rightTitle = new Label("Click products you are interested in"):
       font = new Font(25)
     
-    rightBox.children = Array(rightTitle)
+    rightBox.children = Array(rightTitle, new Separator)
 
     stage.scene = scene1
+
+
+    //Information about product that may be rented
+    val rentHeader = new HBox():
+      padding = standardPadding
+      this.setAlignment(Pos.BaselineCenter)
+
+    val rentHeaderLabel = new Label("Information of the product and the renter"):
+      font = new Font(15)
+    rentHeader.children = rentHeaderLabel
+
+    val rentTitleLabel = new Label("Title:")
+    val productName = new Label(s"name")//${notification.name}")
+
+    val rentTitleBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing * 5
+      children = Array(rentTitleLabel, productName)
+
+    val rentDescLabel = new Label("Description:")
+    val desc = new Label(s"desc")//${notification.description}")
+
+    val rentDescriptionBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+      children = Array(rentDescLabel, desc)
+
+    val rentQuantityBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing*3
+
+      val rentQuantityLabel = new Label("Quantity:")
+      val rentQuantity = new Label("*quantity*")
+
+      children = Array(rentQuantityLabel, rentQuantity)
+
+    val rentPriceLabelDay = new Label("Price per day:")
+    val priceDay = new Label(s"dayprice")//${notification.pricePerDay}")
+
+    val rentPriceLabelHour = new Label("Price per hour:")
+    val priceHour = new Label("hourprice")//s"${notification.pricePerHour}")
+
+    val rentPriceBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+      children = Array(rentPriceLabelDay, priceDay, rentPriceLabelHour, priceHour)
+
+
+    val rentCategoryLabel = new Label("Category:")
+    val rentCategory = new Label("category")//s"${notification.category}")
+
+    val rentCategoryBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+      children = Array(rentCategoryLabel, rentCategory)
+
+    // users informations when creating a new notification
+    val renternameLabel = new Label("Renter name:")
+    val renterName = new Label("rentername")//s"${user.name}")
+
+    val renteraddressLabel = new Label("Renter address:")
+    val renterAddress = new Label("renter address")//s"${user.address}")
+
+    val renterphoneLabel = new Label("Phone number:")
+    val renterPhone = new Label("renter phone")//s"${user.phoneNumber}")
+
+    val renterBox = new VBox():
+      padding = standardPadding
+      spacing = standardSpacing
+
+      children = Array(renternameLabel, renterName, renteraddressLabel, renterAddress, renterphoneLabel, renterPhone)
+
+    val renterBoxHeader = new HBox():
+      padding = standardPadding
+      this.setAlignment(Pos.BaselineCenter)
+
+      val header = new Label("Renters contact information"):
+        font = new Font(15)
+      children = header
+
+    val rentButton = new Button("Make a rent")
+    rentButton.font = Font("System", FontWeight.Bold, 15)
+  //  rentButton.onAction = (event) => *make a rent*
+
+    val cancelButton = new Button("Cancel")
+    cancelButton.onAction = (event) => scene1.root = view1
+
+    val rentButtonBox = new HBox():
+      padding = Insets.apply(30,5,5,5)
+      spacing = standardSpacing * 60
+      children = Array(cancelButton, rentButton)
+
+    view3.children = Array(rentHeader, rentTitleBox, rentDescriptionBox, rentQuantityBox, rentPriceBox, rentCategoryBox,
+      new Separator, renterBoxHeader, renterBox, new Separator, rentButtonBox)
