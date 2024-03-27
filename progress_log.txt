@@ -1,8 +1,13 @@
 1. Sprint
 
 Made Classes Category, Notification, Rent and User and started to build GUI. Need to make changes to GUI since
-plan changed a bit from the original plan. Also I accidentally made 3 different GUI rather than one with
-3 pages. Currently I don't know how to get 3 different GUI to one but I will be working on that for next sprint.
-Classes don't have yet all methods they need to have but I will implement more methods during next sprint too.
+plan changed a bit from the original plan. Also, I accidentally made 3 different GUI rather than one with
+3 pages. Currently, I don't know how to get 3 different GUI to one, but I will be working on that for next sprint.
+Classes don't have yet all methods they need to have, but I will implement more methods during next sprint too.
 
 2. Sprint
+Some details were added to different methods and classes for example incorrect inputs when making a new notification is now handled.
+Added GUI's together so that now you can make a new notification from addNotification button which opens createNotification page.
+Created a filewriter and filereader so that every new notification is written to jsonFile.txt, and it can be read from their too.
+I created also rent making page. Currently, it is useless because I wasn't able to get certain notifications information on that page but
+that is probably next thing to do. Also getting notifications to starting page has to be done next, so I can make progress with rest of the things.
