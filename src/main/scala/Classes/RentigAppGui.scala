@@ -216,6 +216,7 @@ object RentigAppGui extends JFXApp3:
     val seeMoreButton = new Button("See more")
     seeMoreButton.onAction = (event) => scene1.root = view3
 
+
     def createNewNotification(): Unit =
       // product info
       val ptitle = titleTxtField.text.value
@@ -257,7 +258,7 @@ object RentigAppGui extends JFXApp3:
 
         allNotifications.setValue(allNotifications.value :+ notif)
         WriteToFile(notif)
-        //rightBox.children += NotificationPanel(notif, seeMoreButton)
+        rightBox.children += NotificationPanel(notif).button()
         scene1.root = view1
     end createNewNotification
 
@@ -305,7 +306,7 @@ object RentigAppGui extends JFXApp3:
     rightBox.spacing = standardSpacing
     rightBox.setAlignment(Pos.BaselineCenter)
 
-    val rightTitle = new Label("Click products you are interested in"):
+    val rightTitle = new Label("Click 'see more' button to see more about product"):
       font = new Font(25)
     
     rightBox.children = Array(rightTitle, new Separator)
