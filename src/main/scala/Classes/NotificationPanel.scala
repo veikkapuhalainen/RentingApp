@@ -27,7 +27,7 @@ class NotificationPanel(notification: Notification) extends HBox:
   notificationBox.spacing = standardSpacing
 
   val seeMoreButton = new Button(name)
-  seeMoreButton.onAction = (event) => RentigAppGui.
+  seeMoreButton.onAction = (event) => RentigAppGui
 
   def button() =
     seeMoreButton

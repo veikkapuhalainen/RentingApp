@@ -214,8 +214,10 @@ object RentigAppGui extends JFXApp3:
       spacing = standardSpacing
 
     val seeMoreButton = new Button("See more")
-    seeMoreButton.onAction = (event) => scene1.root = view3
 
+
+    val newScene = new Scene(parent = view3)
+    seeMoreButton.onAction = (event) => RentigAppGui.stage.scene = newScene
 
     def createNewNotification(): Unit =
       // product info
