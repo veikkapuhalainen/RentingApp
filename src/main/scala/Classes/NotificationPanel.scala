@@ -8,11 +8,15 @@ import scalafx.collections.{ObservableBuffer, ObservableBufferBase}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control.*
 import scalafx.scene.layout.*
+import scalafx.scene.text.Text
+import scalafx.scene.text.{Font, FontWeight}
 
 import scala.collection.mutable.ListBuffer
 
 class NotificationPanel(notification: Notification) extends HBox:
 
+  val buttonWidth = 70
+  val buttonHeight = 50
   val standardSpacing = 5
   val standardPadding =  Insets.apply(10, 10, 10, 10)
 
@@ -23,29 +27,13 @@ class NotificationPanel(notification: Notification) extends HBox:
   val hourPrice = notification.pricePerHour
   val category = notification.category
 
-  val notificationBox = new HBox()
-  notificationBox.spacing = standardSpacing
 
-  val seeMoreButton = new Button(name)
-  seeMoreButton.onAction = (event) => RentigAppGui
+  val seeMoreButton1 = new Button(s"$name Day Price: ${dayPrice.toString}, Hour Price: ${hourPrice.toString}")
+  seeMoreButton1.minHeight = buttonHeight.toDouble
+  seeMoreButton1.minWidth = buttonWidth.toDouble
 
-  def button() =
-    seeMoreButton
-
-  children = Array(notificationBox)
-
-  RentigAppGui.allNotifications.onChange((_, oldValue, newValue) => addNotificationPanel(newValue.last) )
-
-  def addNotificationPanel(notification: Notification) =
-    notificationBox.children += InfoPanel(notification.description)
+  def button =
+    seeMoreButton1
 
   children = Array(new Label(s"${name}"))
 
-class InfoPanel(description: String) extends VBox:
-
-  val desc = new Label(description)
-  desc.wrapText = true
-
-  val seeMoreButton = new Button("See more")
-
-  children = Array(desc, seeMoreButton)

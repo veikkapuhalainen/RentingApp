@@ -2,7 +2,7 @@ package Classes
 
 import scala.collection.mutable
 
-class Rent(notification: Notification, whoRented: User, rentPrice: Double, returned: Boolean):
+class Rent(notification: Notification, whoRented: User, rentDuration: Int, returned: Boolean):
 
   val comments = mutable.Buffer[String]()
 

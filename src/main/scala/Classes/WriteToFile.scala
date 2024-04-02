@@ -9,17 +9,19 @@ import scala.io.Source
 
 import java.io.{BufferedWriter, File, FileWriter}
 
-class WriteToFile(n: Notification):
+class WriteToFile:
 
-  val notif = n
-  val notifinJson = notif.asJson
+  def writeToFile(n: Notification) =
 
-  val notifJsonString = notifinJson.spaces2
+    val notif = n
+    val notifinJson = notif.asJson
 
-  val file = new File("jsonFile.txt")
-  val writer = new BufferedWriter(new FileWriter(file, true))
-  writer.write(notifJsonString + "\n" + "\n")
-  writer.close()
+    val notifJsonString = notifinJson.spaces2
+
+    val file = new File("jsonFile.txt")
+    val writer = new BufferedWriter(new FileWriter(file, true))
+    writer.write(notifJsonString + "\n" + "\n")
+    writer.close()
 
 
   def readFromFile(notificationName: String): Option[Notification] =
