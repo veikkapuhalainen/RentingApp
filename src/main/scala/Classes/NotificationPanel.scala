@@ -1,7 +1,6 @@
 package Classes
 
 import Classes.User
-import Classes.InformationBox
 import Classes.RentigAppGui
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.{ObservableBuffer, ObservableBufferBase}
@@ -27,13 +26,10 @@ class NotificationPanel(notification: Notification) extends HBox:
   val hourPrice = notification.pricePerHour
   val category = notification.category
 
-
-  val seeMoreButton1 = new Button(s"$name Day Price: ${dayPrice.toString}, Hour Price: ${hourPrice.toString}")
+  val seeMoreButton1 = new Button(s"$name ${"\n"}Price/day: ${dayPrice.toString}€, Price/hour: ${hourPrice.toString}€")
   seeMoreButton1.minHeight = buttonHeight.toDouble
   seeMoreButton1.minWidth = buttonWidth.toDouble
 
   def button =
     seeMoreButton1
-
-  children = Array(new Label(s"${name}"))
 

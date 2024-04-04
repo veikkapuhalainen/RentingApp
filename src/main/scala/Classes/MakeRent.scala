@@ -2,15 +2,17 @@ package Classes
 
 import Classes.RentigAppGui.{standardPadding, standardSpacing}
 import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.control.{Button, Label, Separator}
+import scalafx.scene.control.{Button, DatePicker, Label, Separator}
 import scalafx.scene.layout.{HBox, VBox}
 import scalafx.scene.text.{Font, FontWeight}
 
-case class MakeRent(n: Notification) extends VBox:
+class MakeRent(n: Notification) extends VBox:
+
+    val notification = n
 
     padding = Insets.apply(5,5,5,5)
     spacing = 10
-
+  
     val boldFont = Font("Arial", FontWeight.Bold, 14)
 
     val rentHeader = new HBox():
@@ -95,7 +97,7 @@ case class MakeRent(n: Notification) extends VBox:
       padding = standardPadding
       this.setAlignment(Pos.BaselineCenter)
 
-      val header = new Label("Renters contact information"):
+      val header = new Label("Renters contact information and calendar to see products availability"):
         font = new Font(15)
       children = header
 
@@ -109,8 +111,21 @@ case class MakeRent(n: Notification) extends VBox:
       spacing = standardSpacing * 60
       children = Array(rentCancelButton, rentButton)
 
+    val notifsCalendar = n.calendar
+
+    val calendarBox = new VBox:
+      padding = standardPadding
+      spacing = standardSpacing
+      this.setAlignment(Pos.BaselineCenter)
+
+    calendarBox.children = Array(notifsCalendar)
+
+    val renterCalendarBox = new HBox():
+      children = Array(renterBox,calendarBox)
+
+
     children = Array(rentHeader, rentTitleBox, rentDescriptionBox, rentQuantityBox, rentPriceBox, rentCategoryBox,
-      new Separator, renterBoxHeader, renterBox, new Separator, rentButtonBox)
+      new Separator, renterBoxHeader, renterCalendarBox , new Separator, rentButtonBox)
     
     def cancelBut = rentCancelButton
     def rentBut = rentButton

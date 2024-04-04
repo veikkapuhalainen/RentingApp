@@ -5,40 +5,39 @@ import io.circe.*
 import io.circe.parser.*
 import io.circe.syntax.*
 import io.circe.generic.auto.*
-import scala.io.Source
 
-import java.io.{BufferedWriter, File, FileWriter}
+import scala.io.Source
+import java.io.{File, PrintWriter}
 
 class WriteToFile:
 
-  def writeToFile(n: Notification) =
+  def writeToFile(notification: Notification): Unit = 
+    val source = Source.fromFile("jsonFile.txt")
+    val currentList = try source.mkString finally source.close()
 
-    val notif = n
-    val notifinJson = notif.asJson
+    val currentNotifications = decode[List[Notification]](currentList) match 
+      case Right(notifications) => notifications
+      case Left(_) => List.empty[Notification]
 
-    val notifJsonString = notifinJson.spaces2
+    val newNotifications = currentNotifications :+ notification
+    val newList = newNotifications.asJson.spaces2
 
-    val file = new File("jsonFile.txt")
-    val writer = new BufferedWriter(new FileWriter(file, true))
-    writer.write(notifJsonString + "\n" + "\n")
+    val writer = new PrintWriter(new File("jsonFile.txt"))
+    writer.write(newList)
     writer.close()
 
-
-  def readFromFile(notificationName: String): Option[Notification] =
+  def readFromFile(n: Notification): Option[Notification] = 
     val source = Source.fromFile("jsonFile.txt")
-    val jsonString =
-      try
-        source.mkString
-      catch
-        case error: Error => throw Exception().getCause
-      end try
+    try 
+      val currentList = source.mkString
+
+      val allNotifications = decode[List[Notification]](currentList) match 
+        case Right(list) => list
+        case Left(_) => List.empty[Notification]
+
+      allNotifications.find( c => c.name == n.name && c.publisher == n.publisher && c.pricePerDay == n.pricePerDay
+        && c.pricePerHour == n.pricePerHour && c.description == n.description && c.category == n.category)
+    finally 
       source.close()
-
-    val notifications: Array[Notification] =
-      decode[Array[Notification]](jsonString.asJson.spaces2) match
-        case Right(value) => value
-        case Left(error) => throw error
-
-    notifications.find(_.name == notificationName)
-
+  
 end WriteToFile

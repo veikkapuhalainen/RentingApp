@@ -1,6 +1,5 @@
 package Classes
 
-import Classes.InformationBox
 import scalafx.application.JFXApp3
 import scalafx.collections.{ObservableBuffer, ObservableBufferBase}
 import scalafx.geometry.{Insets, Pos}
@@ -48,7 +47,7 @@ object CreateNotification extends JFXApp3:
           font = new Font(15)
         children = headerLabel
 
-      children = Array(header, InformationBox(UIWidth, UIHeight))
+      children = Array(header) //InformationBox(UIWidth, UIHeight))
 
     val scene = Scene(parent = view2)
     stage.scene = scene

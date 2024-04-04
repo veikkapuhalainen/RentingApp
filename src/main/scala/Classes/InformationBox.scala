@@ -1,4 +1,4 @@
-package Classes
+/*package Classes
 
 import Classes.User
 import Classes.CreateNotification.{categories, standardPadding, standardSpacing}
@@ -13,7 +13,7 @@ class InformationBox(parentWidth: Int, parentHeight: Int) extends VBox:
   def createNewNotification() =
     val creator = User(createrName.text.value, createrAddress.text.value, createrPhone.text.value)
     val notif = creator.makeNotification(titleTxtField.text.value, priceTxtFieldDay.text.value.toDouble, priceTxtFieldhour.text.value.toDouble,
-      descTxtArea.text.value, category.value.value)
+      descTxtArea.text.value, category.value.value, true)
 
     RentigAppGui.allNotifications.setValue(RentigAppGui.allNotifications.value :+ notif)
     RentigAppGui.allNotifications.value.foreach( println(_) )
@@ -124,3 +124,6 @@ class InformationBox(parentWidth: Int, parentHeight: Int) extends VBox:
   //children of informationBox
   children = Array(titleBox, descriptionBox, quantityBox, priceBox, categoryBox, durationBox, createrBoxHeader, createrBox, submitBox)
 
+
+
+*/
