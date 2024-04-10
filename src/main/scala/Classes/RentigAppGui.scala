@@ -164,17 +164,14 @@ object RentigAppGui extends JFXApp3:
     val productsTitle = new Label("Products"):
       font = new Font(25)
 
-    val allProducts = new Button("All products"):
-      font = new Font(10)
-      //onAction = (event) =>
-    val availableBut = new Button("Available"):
-      font = new Font(10)
-     // onAction = (event) =>
-    val reservedBut = new Button("Reserved"):
-      font = new Font(10)
-     // onAction = (event) =>
-    val newNotificationLabel = new Label("Add new notification")
+    val allProducts = new Button("All products")
+    allProducts.font = new Font(10)
+    val availableBut = new Button("Available")
+    availableBut.font = new Font(10)
+    val reservedBut = new Button("Reserved")
+    reservedBut.font = new Font(10)
 
+    val newNotificationLabel = new Label("Add new notification")
     val addNotification = new Button("Add")
 
 
@@ -381,8 +378,12 @@ object RentigAppGui extends JFXApp3:
     val startDateForHours = new DatePicker()
     val startDateForHoursLabel = new Label("Choose date:")
     val startDateTime = new TextField():
+      minWidth = 175
+      maxWidth = 175
       promptText = "Write start time (e.g. 12)"
     val endDateTime = new TextField():
+      minWidth = 175
+      maxWidth = 175
       promptText = "Write end time (e.g. 17)"
 
     val renterCalendarBox = new HBox():
@@ -573,17 +574,27 @@ object RentigAppGui extends JFXApp3:
     leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification)
     addNotification.onAction = (event) => scene1.root = view2
 
+    // add from jsonFile.txt wanted notifications to starting screen
+    def updateStartPage(all: Boolean, available: Boolean): Unit =
+      var notifs = readFile
+      if available then
+        notifs = notifs.filter(_.available)
+      else if !available && !all then
+        notifs = notifs.filterNot(_.available)
+      val buttons = notifs.map( _.button )
+      val notifsButtons = notifs.zip(buttons)
+      notifsButtons.foreach( (n,b) => b.onAction = (event) => makeRentPage(n))
+      rightBox.children = Array(rightTitle, new Separator) ++ buttons
 
-    // add from jsonFile.txt all notifications to starting screen
-    val notifs = readFile
-    val notifsButtons = notifs.map( _.button )
-    val notifsWithButtons = notifs.zip(notifsButtons)
-    notifsWithButtons.foreach( (n,b) => b.onAction = (event) => makeRentPage(n))
-    rightBox.children = Array(rightTitle, new Separator) ++ notifsButtons
+    // Which products are shown in starting page
+    allProducts.onAction = (event) => updateStartPage(true, false)
+    availableBut.onAction = (event) => updateStartPage(false, true)
+    reservedBut.onAction = (event) => updateStartPage(false, false)
 
     rightBox.padding = standardPadding
     rightBox.spacing = standardSpacing
     rightBox.setAlignment(Pos.BaselineCenter)
+    rightBox.children = Array(rightTitle, new Separator)
 
     view3.padding = Insets.apply(5,5,5,5)
     view3.spacing = 5
