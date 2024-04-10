@@ -12,8 +12,9 @@ import scalafx.scene.text.{Font, FontWeight}
 
 import scala.collection.mutable.ListBuffer
 
-class NotificationPanel(notification: Notification) extends HBox:
-
+class NotificationPanel(notification: Notification) extends HBox: 
+  ???
+/*
   val buttonWidth = 70
   val buttonHeight = 50
   val standardSpacing = 5
@@ -33,3 +34,6 @@ class NotificationPanel(notification: Notification) extends HBox:
   def button =
     seeMoreButton1
 
+
+ 
+ */

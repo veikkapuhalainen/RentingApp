@@ -14,5 +14,5 @@ case class User(val name: String, val address: String, val phoneNumber: String):
   def rentProduct(): Rent = ???
   //def rentEndings(): Map[Rent->Day] = ???
 
-  override def toString: String = s"$name, $address, $phoneNumber"
+  override def toString: String = s"Name: $name, address: $address, phonenumber: $phoneNumber"
 end User

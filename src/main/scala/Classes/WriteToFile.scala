@@ -1,11 +1,8 @@
 package Classes
 import io.circe.generic.auto.*
-import cats.syntax.either.*
 import io.circe.*
 import io.circe.parser.*
 import io.circe.syntax.*
-import io.circe.generic.auto.*
-
 import scala.io.Source
 import java.io.{File, PrintWriter}
 
@@ -30,13 +27,12 @@ class WriteToFile:
     val source = Source.fromFile("jsonFile.txt")
     try 
       val currentList = source.mkString
-
       val allNotifications = decode[List[Notification]](currentList) match 
         case Right(list) => list
         case Left(_) => List.empty[Notification]
 
-      allNotifications.find( c => c.name == n.name && c.publisher == n.publisher && c.pricePerDay == n.pricePerDay
-        && c.pricePerHour == n.pricePerHour && c.description == n.description && c.category == n.category)
+      allNotifications.find( c => c==n)//c.name == n.name && c.publisher == n.publisher && c.pricePerDay == n.pricePerDay
+        //&& c.pricePerHour == n.pricePerHour && c.description == n.description && c.category == n.category)
     finally 
       source.close()
   

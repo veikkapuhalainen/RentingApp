@@ -26,6 +26,7 @@ import scala.io.Source
 import java.util
 import java.util.{Calendar, Date}
 import java.time.*
+import java.time.temporal.ChronoUnit
 
 object RentigAppGui extends JFXApp3:
 
@@ -41,12 +42,9 @@ object RentigAppGui extends JFXApp3:
   val correctChars = Array('0','1','2','3','4','5','6','7','8','9')
 
   var allNotifications = ListBuffer[Notification]()
-  var availableNotifications = allNotifications.map( _.available == true )
-  var reservedNotifications = allNotifications.map( _.available == false )
+  var availableNotifications = ListBuffer[Notification]()//allNotifications.map( _.available == true )
+  var reservedNotifications = ListBuffer[Rent]()//allNotifications.map( _.available == false )
 
-  def createNewRent(n: Notification): Unit =
-    val correct = WriteToFile().readFromFile(n)
-    println(correct.getOrElse("ei löytyny"))
 
 
   def start() =
@@ -60,6 +58,24 @@ object RentigAppGui extends JFXApp3:
 
     val scene1 = new Scene(parent = view1)
 
+    //Alerts for incorrect inputs
+    val missingInformationAlert = new Alert(AlertType.Error):
+      title = "Missing Information"
+      headerText = "Remember to fill all information"
+      contentText = "You haven't filled all fields"
+    val inCorrectInputAlert = new Alert(AlertType.Error):
+      title = "Incorrect Information"
+      headerText = "Please fill informations correct"
+      contentText = "You have input characters to fields in which you shouldn't"
+    val missingDateAlert = new Alert(AlertType.Error):
+      title = "Missing Date"
+      headerText = "Remember to choose time for your rent"
+      contentText = "You haven't chosen a date"
+    val inValidDateAlert = new Alert(AlertType.Error):
+      title = "Invalid Date"
+      headerText = "Check dates or time you have chosen"
+      contentText = "You can't make rent for this period of time"
+
     def readFile: List[Notification] =
       val source = Source.fromFile("jsonFile.txt")
       val currentList = try source.mkString finally source.close()
@@ -69,6 +85,38 @@ object RentigAppGui extends JFXApp3:
         case Left(_) => List.empty[Notification]
       currentNotifications
 
+
+    def checkRentDays(start: LocalDate, end: LocalDate): Boolean =
+      val now = LocalDate.now()
+      if start == null || end == null then
+        true
+      else if start.isBefore(now) || end.isBefore(start) then
+        true
+      else
+        false
+
+    def checkRentTime(date: LocalDate, startHour: String, endHour: String ): Boolean =
+      val dateToday = LocalDate.now()
+      val hourNow = LocalTime.now().getHour
+      var inCorrectValue: Boolean = false
+      for i <- 0 until startHour.length do
+        if !(correctChars.contains(startHour(i))) then
+          inCorrectValue = true
+      for i <- 0 until endHour.length do
+        if !(correctChars.contains(endHour(i))) then
+          inCorrectValue = true
+      if inCorrectValue || date == null || startHour == "" || endHour == "" || (startHour.toInt < 0 || startHour.toInt >= 24) || (endHour.toInt <= 0 || endHour.toInt > 24) || startHour.toInt == endHour.toInt then
+        true
+      else if date.isBefore(dateToday) || startHour.toInt == endHour.toInt || startHour.toInt > endHour.toInt || (date.isEqual(dateToday) && startHour.toInt < hourNow) then
+        true
+      else
+        false
+
+    def countDays(start: LocalDate, end: LocalDate): Int =
+      val years = end.getYear - start.getYear
+      val months = end.getMonthValue - start.getMonthValue
+      val days = end.getDayOfMonth - start.getDayOfMonth
+      years*365 + months*30 + days
 
     //Dividing screen to 2 Vboxes
     val rightBox = VBox()
@@ -94,7 +142,7 @@ object RentigAppGui extends JFXApp3:
     view1.rowConstraints = Array(row0, row1)
 
     // filling colors for background
-    leftBox.background = Background.fill(Color.LightCoral)
+    leftBox.background = Background.fill(Color.White)
     rightBox.background = Background.fill(Color.White)
     hSeparator.background = Background.fill(Color.White)
 
@@ -119,7 +167,6 @@ object RentigAppGui extends JFXApp3:
     val allProducts = new Button("All products"):
       font = new Font(10)
       //onAction = (event) =>
-
     val availableBut = new Button("Available"):
       font = new Font(10)
      // onAction = (event) =>
@@ -129,27 +176,6 @@ object RentigAppGui extends JFXApp3:
     val newNotificationLabel = new Label("Add new notification")
 
     val addNotification = new Button("Add")
-
-    /*
-    // add from jsonFile.txt all notifications to starting screen
-    val notifs = readFile
-    val rentDatas = readFile.map( n => MakeRent(n) )
-
-    val notifsButtons = notifs.map( n => NotificationPanel(n).button )
-    val cancelButtons = rentDatas.map( r => r.cancelBut )
-    val rentButtons = rentDatas.map( r => r.rentBut )
-
-    val notifsWithButtons = notifs.zip(notifsButtons)
-    val rentsWithCButtons = rentDatas.zip(cancelButtons)
-    val rentsWithRButtons = rentDatas.zip(rentButtons)
-
-    notifsWithButtons.foreach( (n,b) => b.onAction = (event) => scene1.root = MakeRent(n))
-    cancelButtons.foreach( _.onAction = (event) => scene1.root = view1 )
-    rentsWithRButtons.foreach( (r,b) => b.onAction = (event) => createNewRent(r.notification) )
-
-    rightBox.children = Array(rightTitle, new Separator) ++ notifsButtons
-
-     */
 
 
     //Creating notification page
@@ -250,7 +276,226 @@ object RentigAppGui extends JFXApp3:
       padding = standardPadding
       spacing = standardSpacing
 
-    def clearView2: Unit =
+
+    val boldFont = Font("Arial", FontWeight.Bold, 12)
+
+    val rentHeader = new HBox():
+        padding = standardPadding
+        this.setAlignment(Pos.BaselineCenter)
+
+    val rentHeaderLabel = new Label("Information of the product"):
+      font = new Font(15)
+    rentHeader.children = rentHeaderLabel
+
+    val rentTitleLabel = new Label("Title:")
+
+    val rentTitleBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing * 5
+
+    val rentDescLabel = new Label("Description:")
+    rentDescLabel.padding = standardPadding
+
+    val rentDescriptionBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing*2
+
+    val rentQuantityLabel = new Label("Quantity:")
+    val rentQuantity = new Label("**")
+
+    val rentQuantityBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing*3
+      children = Array(rentQuantityLabel, rentQuantity)
+
+
+    val rentPriceLabelDay = new Label("Price per day:")
+    val rentPriceLabelHour = new Label("Price per hour:")
+
+    val rentPriceBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+
+
+    val rentCategoryLabel = new Label("Category:")
+
+    val rentCategoryBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+
+    // users informations labels when creating a new notification
+    val renternameLabel = new Label("Renter name:")
+    val renteraddressLabel = new Label("Renter address:")
+    val renterphoneLabel = new Label("Phone number:")
+
+    val renterHeader = new Label("Renters contact information"):
+        font = new Font(14)
+
+    val renterBox = new VBox():
+      padding = standardPadding
+      spacing = standardSpacing
+      this.setAlignment(Pos.CenterLeft)
+
+
+    val rentButton = new Button("Make a rent"):
+      font = Font("System", FontWeight.Bold, 15)
+
+
+
+    val rentMakerHeader = new Label("Input your information"):
+        font = new Font(14)
+    val rentMakerNameField = new TextField():
+      promptText = "Name"
+    val rentMakerAddressField = new TextField():
+      promptText = "Address"
+    val rentMakerPhoneField = new TextField():
+      promptText = "Phone number"
+
+    val rentMakerBox = new VBox:
+      spacing = standardSpacing
+      padding = standardPadding
+      this.setAlignment(Pos.BaselineRight)
+      children = Array(rentMakerHeader, rentMakerNameField, rentMakerAddressField, rentMakerPhoneField)
+
+    val cancelButton2 = new Button("Cancel")
+
+    val rentButtonBox = new HBox():
+      padding = Insets.apply(30,5,5,5)
+      spacing = standardSpacing * 60
+      children = Array(cancelButton2, rentButton)
+
+
+    val calendarBox = new VBox:
+      padding = standardPadding
+      spacing = standardSpacing
+      this.setAlignment(Pos.BottomCenter)
+
+    val calendarHeader = new Label("Choose whether you want the rental for specific days or hours"):
+        font = new Font(14)
+
+    val choicesForTime = ObservableBuffer("For days", "For hours")
+    val chooseTimeBox = new ChoiceBox[String](choicesForTime)
+    chooseTimeBox.value = choicesForTime.head
+
+    val startDate = new DatePicker()
+    val startDateLabel = new Label("Choose starting date:")
+    val endDate = new DatePicker()
+    val endDateLabel = new Label("Choose ending date:")
+
+    val startDateForHours = new DatePicker()
+    val startDateForHoursLabel = new Label("Choose date:")
+    val startDateTime = new TextField():
+      promptText = "Write start time (e.g. 12)"
+    val endDateTime = new TextField():
+      promptText = "Write end time (e.g. 17)"
+
+    val renterCalendarBox = new HBox():
+      spacing = standardSpacing
+      padding = standardPadding
+      this.setAlignment(Pos.BaselineCenter)
+      children = Array(renterBox, calendarBox, rentMakerBox)
+
+    def clearView3(): Unit =
+      rentMakerNameField.text = ""
+      rentMakerAddressField.text = ""
+      rentMakerPhoneField.text = ""
+      startDateTime.text = ""
+      endDateTime.text = ""
+      startDate.value = null
+      endDate.value = null
+      startDateForHours.value = null
+
+    def countRentPrice(n: Notification, days: Int, hours: Int): Double =
+      if days != 0 then
+        n.pricePerDay*days
+      else
+        n.pricePerHour*hours
+
+    def createNewRent(n: Notification): Unit =
+      //rentmaker data
+      val rentMakerName = rentMakerNameField.text.value
+      val rentMakerAddress = rentMakerAddressField.text.value
+      val rentMakerPhone = rentMakerPhoneField.text.value
+      //time data of renting for days
+      val forDays = chooseTimeBox.value.value == choicesForTime.head
+      val forHours = chooseTimeBox.value.value == choicesForTime.last
+      val startingDate = startDate.getValue
+      val endingDate = endDate.getValue
+      //time data of renting for hours
+      val startingDateHours = startDateForHours.getValue
+      val startHour = startDateTime.text.value
+      val endHour = endDateTime.text.value
+      //Make sure all info has been added
+      val missingValue: Boolean = rentMakerName == "" || rentMakerPhone == "" || rentMakerAddress == ""
+      var inCorrectValue: Boolean = false
+
+      for i <- 0 until rentMakerPhone.length do
+        if !(correctChars.contains(rentMakerPhone(i))) then
+          inCorrectValue = true
+
+      if missingValue then
+        missingInformationAlert.showAndWait()
+      else if inCorrectValue then
+        inCorrectInputAlert.showAndWait()
+      //see if user has made renting for days or hours and handle wrong inputs
+      else if (chooseTimeBox.value.value == choicesForTime.head && checkRentDays(startingDate, endingDate)) ||
+        (chooseTimeBox.value.value == choicesForTime.last && checkRentTime(startingDateHours, startHour, endHour)) then
+        inValidDateAlert.showAndWait()
+      else
+        val durationDays = if forDays then countDays(startingDate, endingDate) else 0
+        val durationHours = if forHours then endHour.toInt - startHour.toInt else 0
+        val rentMaker = User(rentMakerName, rentMakerAddress, rentMakerPhone)
+        val rentPrice = countRentPrice(n, durationDays, durationHours)
+        val rent = Rent(n, rentMaker, durationDays, durationHours, rentPrice, false)
+
+        clearView3()
+        scene1.root = view1
+        println(rent)
+    end createNewRent
+
+    def makeRentPage(n: Notification) =
+      val productName = new Label(s"${n.name}")
+      productName.font = boldFont
+      val desc = new Label(s"${n.description}")
+      desc.font = boldFont
+      val priceDay = new Label(s"${n.pricePerDay}")
+      priceDay.font = boldFont
+      val priceHour = new Label(s"${n.pricePerHour}")
+      priceHour.font = boldFont
+      val rentCategory = new Label(s"${n.category}")
+      rentCategory.font = boldFont
+      val renterName = new Label(s"${n.publisher.name}")
+      renterName.font = boldFont
+      val renterAddress = new Label(s"${n.publisher.address}")
+      renterAddress.font = boldFont
+      val renterPhone = new Label(s"${n.publisher.phoneNumber}")
+      renterPhone.font = boldFont
+      rentButton.onAction = (event) => createNewRent(n)
+
+      rentTitleBox.children = Array(rentTitleLabel, productName)
+      rentDescriptionBox.children = Array(rentDescLabel, desc)
+      rentQuantityBox.children = Array(rentQuantityLabel, rentQuantity)
+      rentPriceBox.children =  Array(rentPriceLabelDay, priceDay, rentPriceLabelHour, priceHour)
+      rentCategoryBox.children = Array(rentCategoryLabel, rentCategory)
+      renterBox.children = Array(renterHeader, renternameLabel, renterName, renteraddressLabel, renterAddress, renterphoneLabel, renterPhone)
+      renterCalendarBox.children = Array(renterBox, calendarBox, rentMakerBox)
+      scene1.root = view3
+
+    view3.children = Array(rentHeader, rentTitleBox, rentDescriptionBox, rentQuantityBox, rentPriceBox, rentCategoryBox,
+      new Separator, renterCalendarBox , new Separator, rentButtonBox)
+
+
+    def updateView3(): Unit =
+      val selectedOption = chooseTimeBox.getValue
+      selectedOption match
+        case "For days" => calendarBox.children = Array(calendarHeader, chooseTimeBox, startDateLabel, startDate, endDateLabel, endDate)
+        case "For hours" => calendarBox.children = Array(calendarHeader, chooseTimeBox, startDateForHoursLabel, startDateForHours, startDateTime, endDateTime)
+
+    chooseTimeBox.onAction = (event) => updateView3()
+    calendarBox.children = Array(calendarHeader, chooseTimeBox, startDateLabel, startDate, endDateLabel, endDate)
+
+
+    def clearView2(): Unit =
       titleTxtField.text = ""
       priceTxtFieldDay.text = ""
       priceTxtFieldhour.text = ""
@@ -285,32 +530,20 @@ object RentigAppGui extends JFXApp3:
           inCorrectValues = true
 
       if missingValues then
-        val missingAlert = new Alert(AlertType.Error):
-          title = "Missing Information"
-          headerText = "Remember to fill all information"
-          contentText = "You haven't filled all fields"
-          showAndWait()
+        missingInformationAlert.showAndWait()
       else if inCorrectValues then
-        val inCorrectAlert = new Alert(AlertType.Error):
-          title = "Incorrect Information"
-          headerText = "Please fill informations correct"
-          contentText = "You have input characters to fields in which you shouldn't"
-          showAndWait()
+        inCorrectInputAlert.showAndWait()
       else
         val creator = User(name, address, phone)
-        val notif = creator.makeNotification(ptitle, dayPrice.toDouble, hourPrice.toDouble, desc, category.value.value, true)
-        val newPanel = NotificationPanel(notif)
-        val rentData = MakeRent(notif)
+        val notif = Notification(ptitle, creator, dayPrice.toDouble, hourPrice.toDouble, desc, category.value.value, true)
 
         allNotifications = (allNotifications :+ notif)
         WriteToFile().writeToFile(notif)
-        rightBox.children += newPanel.button
-        newPanel.button.onAction = (event) => scene1.root = rentData
-        rentData.cancelBut.onAction = (event) => scene1.root = view1
-        rentData.rentButton.onAction = (event) => createNewRent(notif)
+        rightBox.children += notif.button
+        notif.button.onAction = (event) => makeRentPage(notif)
 
         scene1.root = view1
-        clearView2
+        clearView2()
     end createNewNotification
 
    
@@ -327,28 +560,28 @@ object RentigAppGui extends JFXApp3:
       children = Array(cancelButton, submitButton)
 
 
-    leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification)
+    cancelButton2.onAction = (event) =>
+      clearView3()
+      scene1.root = view1
 
     view2.children = Array(header, titleBox, descriptionBox, quantityBox, priceBox, categoryBox, new Separator, createrBoxHeader, createrBox, submitBox)
 
+    leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification)
     addNotification.onAction = (event) => scene1.root = view2
 
 
-    //RightBox adjusting and children:
+    // add from jsonFile.txt all notifications to starting screen
+    val notifs = readFile
+    val notifsButtons = notifs.map( _.button )
+    val notifsWithButtons = notifs.zip(notifsButtons)
+    notifsWithButtons.foreach( (n,b) => b.onAction = (event) => makeRentPage(n))
+    rightBox.children = Array(rightTitle, new Separator) ++ notifsButtons
+
     rightBox.padding = standardPadding
     rightBox.spacing = standardSpacing
     rightBox.setAlignment(Pos.BaselineCenter)
 
-    val middleTitle = new Label("Categories"):
-      font = new Font(25)
-
-
-    //rightBox adjusting and children
-    rightBox.padding = standardPadding
-    rightBox.spacing = standardSpacing
-    rightBox.setAlignment(Pos.BaselineCenter)
-
-    
-    rightBox.children = Array(rightTitle, new Separator)
+    view3.padding = Insets.apply(5,5,5,5)
+    view3.spacing = 5
 
     stage.scene = scene1
