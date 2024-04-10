@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.util.Date
 import scala.collection.mutable
 
-case class Notification(name: String, publisher: User, pricePerDay: Double, pricePerHour: Double, description: String, category: Category, var available: Boolean):
+case class Notification(name: String, publisher: User, pricePerDay: Double, pricePerHour: Double, description: String, category: Category, amount: Int, var available: Boolean):
 
   val reservedDates = mutable.Buffer[Date]()
   val calendar = new DatePicker()

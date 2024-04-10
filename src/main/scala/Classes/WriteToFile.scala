@@ -32,7 +32,7 @@ class WriteToFile:
         case Left(_) => List.empty[Notification]
 
       allNotifications.find( c => c==n)//c.name == n.name && c.publisher == n.publisher && c.pricePerDay == n.pricePerDay
-        //&& c.pricePerHour == n.pricePerHour && c.description == n.description && c.category == n.category)
+        //&& c.pricePerHour == n.pricePerHour && c.amount == n.amount && c.description == n.description && c.category == n.category)
     finally 
       source.close()
   

@@ -105,7 +105,7 @@ object RentigAppGui extends JFXApp3:
       for i <- 0 until endHour.length do
         if !(correctChars.contains(endHour(i))) then
           inCorrectValue = true
-      if inCorrectValue || date == null || startHour == "" || endHour == "" || (startHour.toInt < 0 || startHour.toInt >= 24) || (endHour.toInt <= 0 || endHour.toInt > 24) || startHour.toInt == endHour.toInt then
+      if inCorrectValue || date == null || startHour == "" || endHour == "" || (startHour.toInt < 0 || startHour.toInt >= 24) || (endHour.toInt <= 0 || endHour.toInt > 24) then
         true
       else if date.isBefore(dateToday) || startHour.toInt == endHour.toInt || startHour.toInt > endHour.toInt || (date.isEqual(dateToday) && startHour.toInt < hourNow) then
         true
@@ -301,13 +301,9 @@ object RentigAppGui extends JFXApp3:
       spacing = standardSpacing*2
 
     val rentQuantityLabel = new Label("Quantity:")
-    val rentQuantity = new Label("**")
-
     val rentQuantityBox = new HBox():
       padding = standardPadding
       spacing = standardSpacing*3
-      children = Array(rentQuantityLabel, rentQuantity)
-
 
     val rentPriceLabelDay = new Label("Price per day:")
     val rentPriceLabelHour = new Label("Price per hour:")
@@ -407,9 +403,9 @@ object RentigAppGui extends JFXApp3:
 
     def countRentPrice(n: Notification, days: Int, hours: Int): Double =
       if days != 0 then
-        n.pricePerDay*days
+        n.pricePerDay * days * n.amount
       else
-        n.pricePerHour*hours
+        n.pricePerHour * hours * n.amount
 
     def createNewRent(n: Notification): Unit =
       //rentmaker data
@@ -462,6 +458,8 @@ object RentigAppGui extends JFXApp3:
       priceDay.font = boldFont
       val priceHour = new Label(s"${n.pricePerHour}")
       priceHour.font = boldFont
+      val rentQuantity = new Label(s"${n.amount}")
+      rentQuantity.font = boldFont
       val rentCategory = new Label(s"${n.category}")
       rentCategory.font = boldFont
       val renterName = new Label(s"${n.publisher.name}")
@@ -512,12 +510,13 @@ object RentigAppGui extends JFXApp3:
       val dayPrice = priceTxtFieldDay.text.value
       val hourPrice = priceTxtFieldhour.text.value
       val desc = descTxtArea.text.value
+      val amount = quantityTxt.text.value
       // user info
       val name = createrName.text.value
       val address =  createrAddress.text.value
       val phone =  createrPhone.text.value
       //checking incorrect inputs
-      val missingValues: Boolean = ptitle == "" || dayPrice == "" || hourPrice == "" || desc == "" || name == "" || address == "" || phone == ""
+      val missingValues: Boolean = ptitle == "" || dayPrice == "" || hourPrice == "" || desc == ""  || amount == "" || name == "" || address == "" || phone == ""
       var inCorrectValues: Boolean = false
       for i <- 0 until dayPrice.length do
         if !(correctChars.contains(dayPrice(i))) then
@@ -525,9 +524,14 @@ object RentigAppGui extends JFXApp3:
       for i <- 0 until hourPrice.length do
         if !(correctChars.contains(hourPrice(i))) then
           inCorrectValues = true
+      for i <- 0 until amount.length do
+        if !(correctChars.contains(amount(i))) then
+          inCorrectValues = true
       for i <- 0 until phone.length do
         if !(correctChars.contains(phone(i))) then
           inCorrectValues = true
+      if dayPrice.toInt == 0 ||hourPrice.toInt == 0 ||amount.toInt == 0 then
+        inCorrectValues = true
 
       if missingValues then
         missingInformationAlert.showAndWait()
@@ -535,7 +539,7 @@ object RentigAppGui extends JFXApp3:
         inCorrectInputAlert.showAndWait()
       else
         val creator = User(name, address, phone)
-        val notif = Notification(ptitle, creator, dayPrice.toDouble, hourPrice.toDouble, desc, category.value.value, true)
+        val notif = Notification(ptitle, creator, dayPrice.toDouble, hourPrice.toDouble, desc, category.value.value, amount.toInt,  true)
 
         allNotifications = (allNotifications :+ notif)
         WriteToFile().writeToFile(notif)
