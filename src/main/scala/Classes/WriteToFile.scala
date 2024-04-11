@@ -8,8 +8,8 @@ import java.io.{File, PrintWriter}
 
 class WriteToFile:
 
-  def writeToFile(notification: Notification): Unit = 
-    val source = Source.fromFile("jsonFile.txt")
+  def writeNotifToFile(notification: Notification): Unit = 
+    val source = Source.fromFile("jsonFileNotif.txt")
     val currentList = try source.mkString finally source.close()
 
     val currentNotifications = decode[List[Notification]](currentList) match 
@@ -19,12 +19,28 @@ class WriteToFile:
     val newNotifications = currentNotifications :+ notification
     val newList = newNotifications.asJson.spaces2
 
-    val writer = new PrintWriter(new File("jsonFile.txt"))
+    val writer = new PrintWriter(new File("jsonFileNotif.txt"))
+    writer.write(newList)
+    writer.close()
+    
+  def writeRentToFile(rent: Rent): Unit = 
+    val source = Source.fromFile("jsonFileRent.txt")
+    val currentList = try source.mkString finally source.close()
+
+    val currentRents = decode[List[Rent]](currentList) match 
+      case Right(rents) => rents
+      case Left(_) => List.empty[Rent]
+
+    val newRents = currentRents :+ rent
+    val newList = newRents.asJson.spaces2
+
+    val writer = new PrintWriter(new File("jsonFileRent.txt"))
     writer.write(newList)
     writer.close()
 
-  def readFromFile(n: Notification): Option[Notification] = 
-    val source = Source.fromFile("jsonFile.txt")
+
+  def readNotifFromFile(n: Notification): Option[Notification] = 
+    val source = Source.fromFile("jsonFileNotif.txt")
     try 
       val currentList = source.mkString
       val allNotifications = decode[List[Notification]](currentList) match 

@@ -16,5 +16,5 @@ that is probably next thing to do. Also getting notifications to starting page h
 Notifciations are now added to starting page atomatically from the files. When you press any of those notification buttons rent making page
 opens with that notification information. Also, you can choose whether you want to rent that product for few hours for some day or to multiple days.
 Wrong inputs are handled in that page by showing error alerts. Currently, when making a rent, app just prints that rent to console. I need to add
-things to rent such as that product updates its reserved days, and in starting page you can see reserved products and available products seperately,
-if user wants so. Also, some details like comments to notifications needs to be added.
+things to rent such as that product updates its reserved days so that rents for same timeperiod isn't possible and you can see the reserved
+days in products calendar. Also, some details like comments to notifications needs to be added.
