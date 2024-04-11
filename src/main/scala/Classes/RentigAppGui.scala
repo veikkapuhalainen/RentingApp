@@ -263,11 +263,10 @@ object RentigAppGui extends JFXApp3:
       val header = new Label("Please fill the fields below regarding you"):
         font = new Font(15)
       children = header
-
+    //rent making page
     val view3 = new VBox():
       padding = standardPadding
       spacing = standardSpacing
-
 
     val boldFont = Font("Arial", FontWeight.Bold, 12)
 
@@ -354,7 +353,7 @@ object RentigAppGui extends JFXApp3:
 
     val rentButtonBox = new HBox():
       padding = Insets.apply(30,5,5,5)
-      spacing = standardSpacing * 60
+      spacing = standardSpacing * 26
       children = Array(cancelButton2, rentButton)
 
 
@@ -391,6 +390,49 @@ object RentigAppGui extends JFXApp3:
       padding = standardPadding
       this.setAlignment(Pos.BaselineCenter)
       children = Array(renterBox, calendarBox, rentMakerBox)
+
+    // comments page
+    val view4 = new VBox():
+      padding = standardPadding
+      spacing = standardSpacing
+
+    val commentsHeader = new Label("Comments of this product")
+    commentsHeader.font = Font("Arial", FontWeight.Bold, 20)
+    commentsHeader.setAlignment(Pos.BaselineCenter)
+    val commentsHeaderBox = new HBox():
+      spacing = standardSpacing
+      this.setAlignment(Pos.BaselineCenter)
+      children = commentsHeader
+
+    val cancelButton3 = new Button("Cancel")
+
+    val commentField = new TextField()
+    val addCommentButton = new Button("Add Comment")
+
+    val commentsButtonBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing *60
+      children = Array(cancelButton3, addCommentButton)
+
+    def addComment(n: Notification) =
+      if commentField.text.value == "" then
+        val emptyAlert = new Alert(AlertType.Error):
+          title = "Empty Comment"
+          headerText = "You can't add empty comment"
+          showAndWait()
+      else
+        n.comments += commentField.text.value
+        commentField.text = ""
+        val allComments = new Label(n.comments.mkString("\n"))
+        view4.children = Array(commentsHeaderBox, allComments, commentField, commentsButtonBox)
+
+    def makeCommentsPage(n: Notification): Unit =
+      val allComments = new Label(n.comments.mkString("\n"))
+      commentField.promptText = "Comment this product"
+      cancelButton3.onAction = (event) => makeRentPage(n)
+      addCommentButton.onAction = (event) => addComment(n)
+      view4.children = Array(commentsHeaderBox, allComments, commentField, commentsButtonBox)
+      scene1.root = view4
 
     def clearView3(): Unit =
       rentMakerNameField.text = ""
@@ -480,6 +522,8 @@ object RentigAppGui extends JFXApp3:
       val renterPhone = new Label(s"${n.publisher.phoneNumber}")
       renterPhone.font = boldFont
       rentButton.onAction = (event) => createNewRent(n)
+      val seeComments = new Button("Comments")
+      seeComments.onAction = (event) => makeCommentsPage(n)
       //startDate = n.datePicker
       //endDate = n.datePicker
       //startDayForHours = n.datePicker
@@ -491,6 +535,7 @@ object RentigAppGui extends JFXApp3:
       rentCategoryBox.children = Array(rentCategoryLabel, rentCategory)
       renterBox.children = Array(renterHeader, renternameLabel, renterName, renteraddressLabel, renterAddress, renterphoneLabel, renterPhone)
       renterCalendarBox.children = Array(renterBox, calendarBox, rentMakerBox)
+      rentButtonBox.children = Array(cancelButton2, seeComments, rentButton)
       scene1.root = view3
 
     view3.children = Array(rentHeader, rentTitleBox, rentDescriptionBox, rentQuantityBox, rentPriceBox, rentCategoryBox,
@@ -586,6 +631,7 @@ object RentigAppGui extends JFXApp3:
 
     leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification)
     addNotification.onAction = (event) => scene1.root = view2
+
 
     // add from jsonFileNotif.txt wanted notifications to starting screen
     def updateStartPage(all: Boolean, available: Boolean): Unit =
