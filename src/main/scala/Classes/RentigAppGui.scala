@@ -27,6 +27,7 @@ import java.util
 import java.util.{Calendar, Date}
 import java.time.*
 import java.time.temporal.ChronoUnit
+import scala.collection.mutable
 
 
 object RentigAppGui extends JFXApp3:
@@ -45,6 +46,8 @@ object RentigAppGui extends JFXApp3:
   var allNotifications = ListBuffer[Notification]()
   var availableNotifications = ListBuffer[Notification]()
   var reservedNotifications = ListBuffer[Rent]()
+
+  private val productPackage = mutable.Set[Notification]()
 
 
 
@@ -67,7 +70,6 @@ object RentigAppGui extends JFXApp3:
     val inCorrectInputAlert = new Alert(AlertType.Error):
       title = "Incorrect Information"
       headerText = "Please fill informations correct"
-      contentText = "You have input characters to fields in which you shouldn't"
     val missingDateAlert = new Alert(AlertType.Error):
       title = "Missing Date"
       headerText = "Remember to choose time for your rent"
@@ -76,6 +78,10 @@ object RentigAppGui extends JFXApp3:
       title = "Invalid Date"
       headerText = "Check dates or time you have chosen"
       contentText = "You can't make rent for this period of time"
+    val noProductsAlert = new Alert(AlertType.Error):
+      title = "No products"
+      headerText = "You can't make an empty package"
+      contentText = "Choose some products to your package by pressing them"
 
     def readFile: List[Notification] =
       val source = Source.fromFile("jsonFileNotif.txt")
@@ -115,9 +121,9 @@ object RentigAppGui extends JFXApp3:
 
     def countDays(start: LocalDate, end: LocalDate): Int =
       val period = Period.between(start, end)
-      val years = end.getYear - start.getYear
-      val months = end.getMonthValue - start.getMonthValue
-      val days = end.getDayOfMonth - start.getDayOfMonth
+      //val years = end.getYear - start.getYear
+      //val months = end.getMonthValue - start.getMonthValue
+      //val days = end.getDayOfMonth - start.getDayOfMonth
       val total = period.getDays
       if total == 0 then 1 else total
 
@@ -151,7 +157,7 @@ object RentigAppGui extends JFXApp3:
 
     val separator = new Separator
     separator.orientation = Orientation.Vertical
-    hSeparator.children = separator
+    //hSeparator.children = separator
 
     hSeparator.padding = standardPadding
     hSeparator.spacing = standardSpacing
@@ -161,13 +167,15 @@ object RentigAppGui extends JFXApp3:
     leftBox.spacing = standardSpacing
     leftBox.setAlignment(Pos.BaselineCenter)
 
-    val rightTitle = new Label("Click products to see more"):
+    val rightTitle = new Label("Click products to see more about them"):
+      font = new Font(25)
+    val rightPackageTitle = new Label("Click products to add them to package"):
       font = new Font(25)
 
     val productsTitle = new Label("Products"):
       font = new Font(25)
 
-    val allProducts = new Button("All products")
+    val allProducts = new Button("All Products")
     allProducts.font = new Font(10)
     val availableBut = new Button("Available")
     availableBut.font = new Font(10)
@@ -176,7 +184,7 @@ object RentigAppGui extends JFXApp3:
 
     val newNotificationLabel = new Label("Add new notification")
     val addNotification = new Button("Add")
-
+    val newPackageLabel = new Label("Rent multiple products")
 
     //Creating notification page
     val view2 = new VBox():
@@ -268,28 +276,47 @@ object RentigAppGui extends JFXApp3:
       padding = standardPadding
       spacing = standardSpacing
 
+    val view5 = new VBox():
+      padding = standardPadding
+      spacing = standardSpacing
+
     val boldFont = Font("Arial", FontWeight.Bold, 12)
 
+    val rentHeaderLabel = new Label("Information of this product"):
+      font = new Font(15)
     val rentHeader = new HBox():
         padding = standardPadding
         this.setAlignment(Pos.BaselineCenter)
-
-    val rentHeaderLabel = new Label("Information of the product"):
-      font = new Font(15)
     rentHeader.children = rentHeaderLabel
 
-    val rentTitleLabel = new Label("Title:")
+    val packageRentHeader = new HBox():
+        padding = standardPadding
+        this.setAlignment(Pos.BaselineCenter)
+    val packageRentHeaderLabel = new Label("Information of the products"):
+      font = new Font(15)
+    packageRentHeader.children = packageRentHeaderLabel
 
+    val rentTitleLabel = new Label("Title:")
     val rentTitleBox = new HBox():
       padding = standardPadding
       spacing = standardSpacing * 5
 
+    val packageRentTitleLabel = new Label("Title:")
+    val packageRentTitleBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+
     val rentDescLabel = new Label("Description:")
     rentDescLabel.padding = standardPadding
-
     val rentDescriptionBox = new HBox():
       padding = standardPadding
-      spacing = standardSpacing*2
+      spacing = standardSpacing
+
+    val packageRentDescLabel = new Label("Description:")
+    packageRentDescLabel.padding = standardPadding
+    val packageRentDescriptionBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
 
     val rentQuantityLabel = new Label("Quantity:")
     val rentQuantityBox = new HBox():
@@ -298,23 +325,30 @@ object RentigAppGui extends JFXApp3:
 
     val rentPriceLabelDay = new Label("Price per day:")
     val rentPriceLabelHour = new Label("Price per hour:")
-
     val rentPriceBox = new HBox():
       padding = standardPadding
       spacing = standardSpacing
 
+    val packageRentPriceLabelDay = new Label("Price per day:")
+    val packageRentPriceLabelHour = new Label("Price per hour:")
+    val packageRentPriceBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
 
     val rentCategoryLabel = new Label("Category:")
-
     val rentCategoryBox = new HBox():
       padding = standardPadding
       spacing = standardSpacing
 
-    // users informations labels when creating a new notification
+    val packageRentCategoryLabel = new Label("Categories:")
+    val packageRentCategoryBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+
+    // users informations labels when creating a new rent
     val renternameLabel = new Label("Renter name:")
     val renteraddressLabel = new Label("Renter address:")
     val renterphoneLabel = new Label("Phone number:")
-
     val renterHeader = new Label("Renters contact information"):
         font = new Font(14)
 
@@ -323,10 +357,21 @@ object RentigAppGui extends JFXApp3:
       spacing = standardSpacing
       this.setAlignment(Pos.CenterLeft)
 
+    val packageRenternameLabel = new Label("Names:")
+    val packageRenterHeader = new Label("All renters names"):
+        font = new Font(14)
+
+    val packageRenterBox = new VBox():
+      padding = standardPadding
+      spacing = standardSpacing
+      this.setAlignment(Pos.CenterLeft)
+
 
     val rentButton = new Button("Make a rent"):
       font = Font("System", FontWeight.Bold, 15)
 
+    val packageRentButton = new Button("Make a rent"):
+      font = Font("System", FontWeight.Bold, 15)
 
 
     val rentMakerHeader = new Label("Input your information"):
@@ -336,6 +381,15 @@ object RentigAppGui extends JFXApp3:
     val rentMakerAddressField = new TextField():
       promptText = "Address"
     val rentMakerPhoneField = new TextField():
+      promptText = "Phone number"
+
+    val packageRentMakerHeader = new Label("Input your information"):
+        font = new Font(14)
+    val packageRentMakerName = new TextField():
+      promptText = "Name"
+    val packageRentMakerAddress = new TextField():
+      promptText = "Address"
+    val packageRentMakerPhone = new TextField():
       promptText = "Phone number"
 
     val amountLabel = new Label("How many you want:")
@@ -349,19 +403,30 @@ object RentigAppGui extends JFXApp3:
       this.setAlignment(Pos.BaselineRight)
       children = Array(rentMakerHeader, rentMakerNameField, rentMakerAddressField, rentMakerPhoneField, amountLabel, amountText)
 
+    val packageRentMakerBox = new VBox:
+      spacing = standardSpacing
+      padding = standardPadding
+      this.setAlignment(Pos.BaselineRight)
+      children = Array(packageRentMakerHeader, packageRentMakerName, packageRentMakerAddress, packageRentMakerPhone)
+
     val cancelButton2 = new Button("Cancel")
+    val cancelButton5 = new Button("Cancel")
 
     val rentButtonBox = new HBox():
       padding = Insets.apply(30,5,5,5)
-      spacing = standardSpacing * 26
+      spacing = standardSpacing * 15
       children = Array(cancelButton2, rentButton)
+
+    val packageRentButtonBox = new HBox():
+      padding = Insets.apply(30,5,5,5)
+      spacing = standardSpacing * 48
+      children = Array(cancelButton5, packageRentButton)
 
 
     val calendarBox = new VBox:
       padding = standardPadding
       spacing = standardSpacing
       this.setAlignment(Pos.BottomCenter)
-
     val calendarHeader = new Label("Choose whether you want the rental for specific days or hours"):
         font = new Font(14)
 
@@ -373,7 +438,6 @@ object RentigAppGui extends JFXApp3:
     val startDateLabel = new Label("Choose starting date:")
     var endDate = new DatePicker()
     val endDateLabel = new Label("Choose ending date:")
-
     var startDateForHours = new DatePicker()
     val startDateForHoursLabel = new Label("Choose date:")
     val startDateTime = new TextField():
@@ -390,6 +454,39 @@ object RentigAppGui extends JFXApp3:
       padding = standardPadding
       this.setAlignment(Pos.BaselineCenter)
       children = Array(renterBox, calendarBox, rentMakerBox)
+
+
+    val packageCalendarBox = new VBox:
+      padding = standardPadding
+      spacing = standardSpacing
+      this.setAlignment(Pos.BottomCenter)
+    val packageCalendarHeader = new Label("Choose whether you want the rental for specific days or hours"):
+        font = new Font(14)
+
+    val packageChoicesForTime = ObservableBuffer("For days", "For hours")
+    val packageChooseTimeBox = new ChoiceBox[String](choicesForTime)
+    packageChooseTimeBox.value = choicesForTime.head
+
+    var packageStartDate = new DatePicker()
+    val packageStartDateLabel = new Label("Choose starting date:")
+    var packageEndDate = new DatePicker()
+    val packageEndDateLabel = new Label("Choose ending date:")
+    var packageStartDateForHours = new DatePicker()
+    val packageStartDateForHoursLabel = new Label("Choose date:")
+    val packageStartDateTime = new TextField():
+      minWidth = 175
+      maxWidth = 175
+      promptText = "Write start time (e.g. 12)"
+    val packageEndDateTime = new TextField():
+      minWidth = 175
+      maxWidth = 175
+      promptText = "Write end time (e.g. 17)"
+
+    val packageRenterCalendarBox = new HBox():
+      spacing = standardSpacing
+      padding = standardPadding
+      this.setAlignment(Pos.BaselineCenter)
+      children = Array(packageRenterBox, packageCalendarBox, packageRentMakerBox)
 
     // comments page
     val view4 = new VBox():
@@ -426,13 +523,6 @@ object RentigAppGui extends JFXApp3:
         val allComments = new Label(n.comments.mkString("\n"))
         view4.children = Array(commentsHeaderBox, allComments, commentField, commentsButtonBox)
 
-    def makeCommentsPage(n: Notification): Unit =
-      val allComments = new Label(n.comments.mkString("\n"))
-      commentField.promptText = "Comment this product"
-      cancelButton3.onAction = (event) => makeRentPage(n)
-      addCommentButton.onAction = (event) => addComment(n)
-      view4.children = Array(commentsHeaderBox, allComments, commentField, commentsButtonBox)
-      scene1.root = view4
 
     def clearView3(): Unit =
       rentMakerNameField.text = ""
@@ -445,11 +535,22 @@ object RentigAppGui extends JFXApp3:
       endDate.value = null
       startDateForHours.value = null
 
-    def countRentPrice(n: Notification, quantity: Int, days: Int, hours: Int): Double =
+    def clearView5(): Unit =
+      packageRentMakerName.text = ""
+      packageRentMakerAddress.text = ""
+      packageRentMakerPhone.text = ""
+      packageStartDateTime.text = ""
+      packageEndDateTime.text = ""
+      packageStartDate.value = null
+      packageEndDate.value = null
+      packageStartDateForHours.value = null
+
+
+    def countRentPrice(n: mutable.Set[Notification], quantity: Int, days: Int, hours: Int): Double =
       if days != 0 then
-        n.pricePerDay * days * quantity
+        n.map(_.pricePerDay).sum * days * quantity
       else
-        n.pricePerHour * hours * quantity
+        n.map(_.pricePerHour).sum * hours * quantity
 
     def createNewRent(n: Notification): Unit =
       //rentmaker data
@@ -476,7 +577,10 @@ object RentigAppGui extends JFXApp3:
       for i <- 0 until quantity.length do
         if !(correctChars.contains(quantity(i))) then
           inCorrectValue = true
-      if quantity.toInt == 0 || quantity.toInt > n.amount then
+      if quantity == "0" then
+        inCorrectValue = true
+        inCorrectInputAlert.showAndWait()
+      if quantity.toInt > n.amount then
         inCorrectValue = true
 
       if missingValue then
@@ -491,25 +595,82 @@ object RentigAppGui extends JFXApp3:
         val durationDays = if forDays then countDays(startingDate, endingDate) else 0
         val durationHours = if forHours then endHour.toInt - startHour.toInt else 0
         val rentMaker = User(rentMakerName, rentMakerAddress, rentMakerPhone)
-        val rentPrice = countRentPrice(n, quantity.toInt, durationDays, durationHours)
+        val rentPrice = countRentPrice(mutable.Set(n), quantity.toInt, durationDays, durationHours)
         val rent = Rent(n, rentMaker, quantity.toInt,
           if forDays then startingDate else startingDateHours, if forDays then endingDate else startingDateHours,
           if forHours then startHour.toInt else 0, if forHours then endHour.toInt else 0, rentPrice)
 
+        rentMaker.rents += rent
         n.reservedDates += Period.between(if forDays then startingDate else startingDateHours, if forDays then endingDate else startingDateHours)
         WriteToFile().writeRentToFile(rent)
         scene1.root = view1
         clearView3()
     end createNewRent
 
+    def createNewRentForPackage(notifs: mutable.Set[Notification]) =
+      //rentmaker data
+      val rentMakerName = packageRentMakerName.text.value
+      val rentMakerAddress = packageRentMakerAddress.text.value
+      val rentMakerPhone = packageRentMakerPhone.text.value
+      val quantity = 1
+      //time data of renting for days
+      val forDays = packageChooseTimeBox.value.value == choicesForTime.head
+      val forHours = packageChooseTimeBox.value.value == choicesForTime.last
+      val startingDate = packageStartDate.getValue
+      val endingDate = packageEndDate.getValue
+      //time data of renting for hours
+      val startingDateHours = packageStartDateForHours.getValue
+      val startHour = packageStartDateTime.text.value
+      val endHour = packageEndDateTime.text.value
+      //Make sure all info has been added
+      val missingValue: Boolean = rentMakerName == "" || rentMakerPhone == "" || rentMakerAddress == ""
+      var inCorrectValue: Boolean = false
+
+      for i <- 0 until rentMakerPhone.length do
+        if !(correctChars.contains(rentMakerPhone(i))) then
+          inCorrectValue = true
+
+      if missingValue then
+        missingInformationAlert.showAndWait()
+      else if inCorrectValue then
+        inCorrectInputAlert.showAndWait()
+      //see if user has made renting for days or hours and handle wrong inputs
+      else if (chooseTimeBox.value.value == choicesForTime.head && checkRentDays(startingDate, endingDate)) ||
+        (chooseTimeBox.value.value == choicesForTime.last && checkRentTime(startingDateHours, startHour, endHour)) then
+        inValidDateAlert.showAndWait()
+      else
+        val durationDays = if forDays then countDays(startingDate, endingDate) else 0
+        val durationHours = if forHours then endHour.toInt - startHour.toInt else 0
+        val rentMaker = User(rentMakerName, rentMakerAddress, rentMakerPhone)
+        val rentPrice = countRentPrice(notifs, quantity, durationDays, durationHours)
+        val rents = notifs.map( n => Rent(n, rentMaker, quantity.toInt,
+          if forDays then startingDate else startingDateHours, if forDays then endingDate else startingDateHours,
+          if forHours then startHour.toInt else 0, if forHours then endHour.toInt else 0, rentPrice))
+
+        rentMaker.rents ++= rents
+        notifs.foreach(_.reservedDates += Period.between(if forDays then startingDate else startingDateHours, if forDays then endingDate else startingDateHours))
+        rents.foreach( r => WriteToFile().writeRentToFile(r) )
+        scene1.root = view1
+        clearView5()
+        productPackage.clear()
+    end createNewRentForPackage
+
+
+    val deleteNotifButton = new Button("DELETE")
+    def deleteNotification(notification: Notification) =
+      WriteToFile().deleteNotification(notification)
+      //updateStartPage(true, false)
+      scene1.root = view1
+
+
     def makeRentPage(n: Notification) =
       val productName = new Label(s"${n.name}")
       productName.font = boldFont
       val desc = new Label(s"${n.description}")
       desc.font = boldFont
-      val priceDay = new Label(s"${n.pricePerDay}")
+      val priceDay = new Label(s"${n.pricePerDay}€")
       priceDay.font = boldFont
-      val priceHour = new Label(s"${n.pricePerHour}")
+      val priceHour = new Label(s"${n.pricePerHour}€")
       priceHour.font = boldFont
       val rentQuantity = new Label(s"${n.amount}")
       rentQuantity.font = boldFont
@@ -524,6 +685,7 @@ object RentigAppGui extends JFXApp3:
       rentButton.onAction = (event) => createNewRent(n)
       val seeComments = new Button("Comments")
       seeComments.onAction = (event) => makeCommentsPage(n)
+      deleteNotifButton.onAction = (event) => deleteNotification(n)
       //startDate = n.datePicker
       //endDate = n.datePicker
       //startDayForHours = n.datePicker
@@ -535,7 +697,7 @@ object RentigAppGui extends JFXApp3:
       rentCategoryBox.children = Array(rentCategoryLabel, rentCategory)
       renterBox.children = Array(renterHeader, renternameLabel, renterName, renteraddressLabel, renterAddress, renterphoneLabel, renterPhone)
       renterCalendarBox.children = Array(renterBox, calendarBox, rentMakerBox)
-      rentButtonBox.children = Array(cancelButton2, seeComments, rentButton)
+      rentButtonBox.children = Array(cancelButton2, deleteNotifButton, seeComments, rentButton)
       scene1.root = view3
 
     view3.children = Array(rentHeader, rentTitleBox, rentDescriptionBox, rentQuantityBox, rentPriceBox, rentCategoryBox,
@@ -551,6 +713,52 @@ object RentigAppGui extends JFXApp3:
     chooseTimeBox.onAction = (event) => updateView3()
     calendarBox.children = Array(calendarHeader, chooseTimeBox, startDateLabel, startDate, endDateLabel, endDate)
 
+    def updateView5(): Unit =
+      val selectedOption = packageChooseTimeBox.getValue
+      selectedOption match
+        case "For days" => packageCalendarBox.children = Array(packageCalendarHeader, packageChooseTimeBox, packageStartDateLabel, packageStartDate, packageEndDateLabel, packageEndDate)
+        case "For hours" => packageCalendarBox.children = Array(packageCalendarHeader, packageChooseTimeBox, packageStartDateForHoursLabel, packageStartDateForHours, packageStartDateTime, packageEndDateTime)
+
+    packageChooseTimeBox.onAction = (event) => updateView5()
+    packageCalendarBox.children = Array(packageCalendarHeader, packageChooseTimeBox, packageStartDateLabel, packageStartDate, packageEndDateLabel, packageEndDate)
+
+
+    def makeRentPageForPackage(notifs: mutable.Set[Notification]) =
+      val packageName = new Label(s"${notifs.map(_.name).mkString(" || ")}")
+      packageName.font = boldFont
+      val packageDesc = new Label(s"${notifs.map(_.description).mkString(" || ")}")
+      packageDesc.font = boldFont
+      val packagePriceDay = new Label(s"${notifs.map(_.pricePerDay).sum}")
+      packagePriceDay.font = boldFont
+      val packagePriceHour = new Label(s"${notifs.map(_.pricePerHour).sum}")
+      packagePriceHour.font = boldFont
+      val packageQuantity = new Label(s"${notifs.map(_.amount).mkString(" || ")}")
+      packageQuantity.font = boldFont
+      val packageCategories = new Label(s"${notifs.map(_.category).mkString(" || ")}")
+      packageCategories.font = boldFont
+      val renterNames = new Label(s"${notifs.map(_.publisher.name).mkString("\n")}")
+      renterNames.font = boldFont
+      packageRentButton.onAction = (event) => createNewRentForPackage(notifs)
+
+      packageRentTitleBox.children = Array(packageRentTitleLabel, packageName)
+      packageRentDescriptionBox.children = Array(packageRentDescLabel, packageDesc)
+      packageRentPriceBox.children =  Array(packageRentPriceLabelDay, packagePriceDay, packageRentPriceLabelHour, packagePriceHour)
+      packageRentCategoryBox.children = Array(packageRentCategoryLabel, packageCategories)
+      packageRenterBox.children = Array(packageRenterHeader, packageRenternameLabel, renterNames)
+      packageRenterCalendarBox.children = Array(packageRenterBox, packageCalendarBox, packageRentMakerBox)
+      packageRentButtonBox.children = Array(cancelButton5, packageRentButton)
+      scene1.root = view5
+
+    view5.children = Array(packageRentHeader, packageRentTitleBox, packageRentDescriptionBox, packageRentPriceBox, packageRentCategoryBox,
+      new Separator, packageRenterCalendarBox , new Separator, packageRentButtonBox)
+
+    def makeCommentsPage(n: Notification): Unit =
+      val allComments = new Label(n.comments.mkString("\n"))
+      commentField.promptText = "Comment this product"
+      cancelButton3.onAction = (event) => makeRentPage(n)
+      addCommentButton.onAction = (event) => addComment(n)
+      view4.children = Array(commentsHeaderBox, allComments, commentField, commentsButtonBox)
+      scene1.root = view4
 
     def clearView2(): Unit =
       titleTxtField.text = ""
@@ -598,8 +806,9 @@ object RentigAppGui extends JFXApp3:
         inCorrectInputAlert.showAndWait()
       else
         val creator = User(name, address, phone)
-        val notif = Notification(ptitle, creator, dayPrice.toDouble, hourPrice.toDouble, desc, category.value.value, amount.toInt,  true)
+        val notif = Notification(ptitle, creator, dayPrice.toDouble, hourPrice.toDouble, desc, category.value.value, amount.toInt, true)
 
+        creator.notifications += notif
         allNotifications = (allNotifications :+ notif)
         WriteToFile().writeNotifToFile(notif)
         rightBox.children += notif.button
@@ -626,12 +835,77 @@ object RentigAppGui extends JFXApp3:
     cancelButton2.onAction = (event) =>
       clearView3()
       scene1.root = view1
+    cancelButton5.onAction = (event) =>
+      clearView5()
+      productPackage.clear()
+      scene1.root = view1
 
-    view2.children = Array(header, titleBox, descriptionBox, quantityBox, priceBox, categoryBox, new Separator, createrBoxHeader, createrBox, submitBox)
 
-    leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification)
-    addNotification.onAction = (event) => scene1.root = view2
+    val createPackageHeader = new Label("Create new Package"):
+      font = Font("Arial", FontWeight.Bold, 20)
+    val view5HeaderBox = new HBox():
+      spacing = standardSpacing
+      padding = standardPadding
+      this.setAlignment(Pos.BaselineCenter)
+      children = createPackageHeader
 
+    val packageName = new TextField():
+      promptText = "Create your package by writing its name and pressing 'Create Package'"
+      minWidth = 150
+      maxWidth = 150
+    val packageNameBox = new HBox():
+      spacing = standardSpacing
+      padding = standardPadding
+      this.setAlignment(Pos.BaselineCenter)
+      children = packageName
+
+    val cancelButton4 = new Button("Cancel")
+
+    def addToPackage(notification: Notification): Unit =
+      productPackage += notification
+      println(s"added ${notification.name} to package")
+
+    val packageDoneButton = new Button("Package Done"):
+      font = boldFont
+      this.setAlignment(Pos.BottomCenter)
+
+    def addPackageButtons() =
+      val notifs = readFile
+      val packageButtons = notifs.map( _.packageButton )
+      val notifsButtons = notifs.zip(packageButtons)
+      notifsButtons.foreach( (n,b) => b.onAction = (event) => addToPackage(n))
+      rightBox.children = Array(rightPackageTitle, new Separator) ++ packageButtons
+      leftBox.children = packageDoneButton
+/*
+    val packageReadyButton = new Button("Create Package")
+    packageReadyButton.onAction = (event) =>
+      if packageName.text.value == "" then
+        missingInformationAlert.showAndWait()
+      else
+        addPackageButtons()
+        scene1.root = view1
+
+ */
+
+/*
+    val addToPackageBox = new HBox():
+      spacing = standardSpacing * 40
+      padding = standardPadding
+      this.setAlignment(Pos.BottomCenter)
+      //children = Array(cancelButton4, packageReadyButton)
+
+    val view5 = new VBox():
+      padding = standardPadding
+      spacing = standardSpacing
+
+    view5.children = Array(view5HeaderBox, new Separator, packageNameBox, addToPackageBox)
+
+ */
+
+
+    val startCreatingPackage = new Button("Create Package")
+    startCreatingPackage.onAction = (event) =>
+      addPackageButtons()
 
     // add from jsonFileNotif.txt wanted notifications to starting screen
     def updateStartPage(all: Boolean, available: Boolean): Unit =
@@ -644,11 +918,31 @@ object RentigAppGui extends JFXApp3:
       val notifsButtons = notifs.zip(buttons)
       notifsButtons.foreach( (n,b) => b.onAction = (event) => makeRentPage(n))
       rightBox.children = Array(rightTitle, new Separator) ++ buttons
+      leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification, newPackageLabel, startCreatingPackage)
 
     // Which products are shown in starting page
     allProducts.onAction = (event) => updateStartPage(true, false)
     availableBut.onAction = (event) => updateStartPage(false, true)
     reservedBut.onAction = (event) => updateStartPage(false, false)
+
+
+    cancelButton4.onAction = (event) =>
+      updateStartPage(true, false)
+      scene1.root = view1
+
+    packageDoneButton.onAction = (event) =>
+      if productPackage.isEmpty then
+        noProductsAlert.showAndWait()
+      else
+        println("package is done")
+        updateStartPage(true, false)
+        leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification,  newPackageLabel, startCreatingPackage)
+        makeRentPageForPackage(productPackage)
+
+    addNotification.onAction = (event) => scene1.root = view2
+
+    view2.children = Array(header, titleBox, descriptionBox, quantityBox, priceBox, categoryBox, new Separator, createrBoxHeader, createrBox, submitBox)
+    leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification,  newPackageLabel, startCreatingPackage)
 
     rightBox.padding = standardPadding
     rightBox.spacing = standardSpacing

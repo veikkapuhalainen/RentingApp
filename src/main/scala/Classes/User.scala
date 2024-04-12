@@ -6,7 +6,7 @@ case class User(val name: String, val address: String, val phoneNumber: String):
 
 
   val notifications = mutable.Buffer[Notification]()
-  val rents = mutable.Buffer[Rent]()
+  val rents = mutable.Set[Rent]()
 
   def makeNotification(name: String, pricePerDay: Double, pricePerHour: Double, description: String, category: Category, amount: Int, available: Boolean): Notification =
     Notification(name, this, pricePerDay, pricePerHour, description, category, amount, true)
