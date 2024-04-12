@@ -83,7 +83,7 @@ object RentigAppGui extends JFXApp3:
       headerText = "You can't make an empty package"
       contentText = "Choose some products to your package by pressing them"
 
-    def readFile: List[Notification] =
+    def readNotifications: List[Notification] =
       val source = Source.fromFile("jsonFileNotif.txt")
       val currentList = try source.mkString finally source.close()
 
@@ -92,19 +92,43 @@ object RentigAppGui extends JFXApp3:
         case Left(_) => List.empty[Notification]
       currentNotifications
 
+    def readRents: List[Rent] =
+      val source = Source.fromFile("jsonFileRent.txt")
+      val currentList = try source.mkString finally source.close()
 
-    def checkRentDays(start: LocalDate, end: LocalDate): Boolean =
+      val currentRents = decode[List[Rent]](currentList) match
+        case Right(rents) => rents
+        case Left(_) => List.empty[Rent]
+      currentRents
+
+
+    def checkRentDays(notifications: mutable.Set[Notification], start: LocalDate, end: LocalDate): Boolean =
       val now = LocalDate.now()
+      val existingRents = readRents.filter( r => notifications.contains(r.notification) )
+      val startDays = existingRents.map( _.startDay )
+      val endDays = existingRents.map( _.endDay )
+      val startsWends = startDays.zip(endDays)
+      val overLapExisting = startsWends.exists( (s,e) => (start.isBefore(s) && end.isAfter(s)) || (start.isAfter(s) && end.isBefore(e)) || (start.isBefore(e) && end.isAfter(e)) )
+
       if start == null || end == null then
         true
       else if start.isBefore(now) || end.isBefore(start) then
         true
+      else if overLapExisting then
+        true
       else
         false
 
-    def checkRentTime(date: LocalDate, startHour: String, endHour: String ): Boolean =
+    def checkRentTime(notifications: mutable.Set[Notification], date: LocalDate, startHour: String, endHour: String ): Boolean =
       val dateToday = LocalDate.now()
       val hourNow = LocalTime.now().getHour
+
+      val existingRents = readRents.filter( r => notifications.contains(r.notification) )
+      val startDays = existingRents.map( _.startDay )
+      val startHours = existingRents.map( _.startHour )
+      val endHours = existingRents.map( _.endHour )
+      val startDaysWhours = startDays.zip(startHours.zip(endHours))
+
       var inCorrectValue: Boolean = false
       for i <- 0 until startHour.length do
         if !(correctChars.contains(startHour(i))) then
@@ -116,14 +140,13 @@ object RentigAppGui extends JFXApp3:
         true
       else if date.isBefore(dateToday) || startHour.toInt == endHour.toInt || startHour.toInt > endHour.toInt || (date.isEqual(dateToday) && startHour.toInt < hourNow) then
         true
+      else if startDaysWhours.exists( (d,h) => d == date && ((startHour.toInt < h._1 && endHour.toInt > h._1) || (startHour.toInt > h._1 && endHour.toInt < h._2) || (startHour.toInt < h._2 && endHour.toInt > h._2))) then
+        true
       else
         false
 
     def countDays(start: LocalDate, end: LocalDate): Int =
       val period = Period.between(start, end)
-      //val years = end.getYear - start.getYear
-      //val months = end.getMonthValue - start.getMonthValue
-      //val days = end.getDayOfMonth - start.getDayOfMonth
       val total = period.getDays
       if total == 0 then 1 else total
 
@@ -588,8 +611,8 @@ object RentigAppGui extends JFXApp3:
       else if inCorrectValue then
         inCorrectInputAlert.showAndWait()
       //see if user has made renting for days or hours and handle wrong inputs
-      else if (chooseTimeBox.value.value == choicesForTime.head && checkRentDays(startingDate, endingDate)) ||
-        (chooseTimeBox.value.value == choicesForTime.last && checkRentTime(startingDateHours, startHour, endHour)) then
+      else if (chooseTimeBox.value.value == choicesForTime.head && checkRentDays(mutable.Set(n), startingDate, endingDate)) ||
+        (chooseTimeBox.value.value == choicesForTime.last && checkRentTime(mutable.Set(n), startingDateHours, startHour, endHour)) then
         inValidDateAlert.showAndWait()
       else
         val durationDays = if forDays then countDays(startingDate, endingDate) else 0
@@ -635,8 +658,8 @@ object RentigAppGui extends JFXApp3:
       else if inCorrectValue then
         inCorrectInputAlert.showAndWait()
       //see if user has made renting for days or hours and handle wrong inputs
-      else if (chooseTimeBox.value.value == choicesForTime.head && checkRentDays(startingDate, endingDate)) ||
-        (chooseTimeBox.value.value == choicesForTime.last && checkRentTime(startingDateHours, startHour, endHour)) then
+      else if (chooseTimeBox.value.value == choicesForTime.head && checkRentDays(notifs, startingDate, endingDate)) ||
+        (chooseTimeBox.value.value == choicesForTime.last && checkRentTime(notifs, startingDateHours, startHour, endHour)) then
         inValidDateAlert.showAndWait()
       else
         val durationDays = if forDays then countDays(startingDate, endingDate) else 0
@@ -870,7 +893,7 @@ object RentigAppGui extends JFXApp3:
       this.setAlignment(Pos.BottomCenter)
 
     def addPackageButtons() =
-      val notifs = readFile
+      val notifs = readNotifications
       val packageButtons = notifs.map( _.packageButton )
       val notifsButtons = notifs.zip(packageButtons)
       notifsButtons.foreach( (n,b) => b.onAction = (event) => addToPackage(n))
@@ -909,7 +932,7 @@ object RentigAppGui extends JFXApp3:
 
     // add from jsonFileNotif.txt wanted notifications to starting screen
     def updateStartPage(all: Boolean, available: Boolean): Unit =
-      var notifs = readFile
+      var notifs = readNotifications
       if available then
         notifs = notifs.filter(_.available)
       else if !available && !all then
