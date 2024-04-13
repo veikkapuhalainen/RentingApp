@@ -57,6 +57,15 @@ class WriteToFile:
     writer.close()
 
 
+  def readRentsFromFile: List[Rent] =
+      val source = Source.fromFile("jsonFileRent.txt")
+      val currentList = try source.mkString finally source.close()
+
+      val currentRents = decode[List[Rent]](currentList) match
+        case Right(rents) => rents
+        case Left(_) => List.empty[Rent]
+      currentRents
+      
   def readNotifFromFile(n: Notification): Option[Notification] =
     val source = Source.fromFile("jsonFileNotif.txt")
     try 
