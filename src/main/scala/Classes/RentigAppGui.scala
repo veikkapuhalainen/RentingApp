@@ -16,6 +16,8 @@ import scalafx.scene.text.{Font, FontWeight}
 import scala.collection.mutable.ListBuffer
 import io.circe.generic.auto.*
 import io.circe.*
+import scalafx.scene.control.Control.sfxControl2jfx
+
 import scala.io.Source
 import java.time.*
 import scala.collection.mutable
@@ -34,12 +36,12 @@ object RentigAppGui extends JFXApp3:
 
   val correctChars = Array('0','1','2','3','4','5','6','7','8','9')
 
-  var allNotifications = ListBuffer[Notification]()
-  var availableNotifications = ListBuffer[Notification]()
-  var reservedNotifications = ListBuffer[Rent]()
+  var buttons1 = mutable.Buffer[Button]()
+  var buttons2 = mutable.Buffer[Button]()
+  var buttons3 = mutable.Buffer[Button]()
+  var buttons4 = mutable.Buffer[Button]()
 
   private val productPackage = mutable.Set[Notification]()
-
 
 
   def start() =
@@ -73,6 +75,10 @@ object RentigAppGui extends JFXApp3:
       title = "No products"
       headerText = "You can't make an empty package"
       contentText = "Choose some products to your package by pressing them"
+    val tooManyProductsAlert = new Alert(AlertType.Error):
+      title = "Too many products"
+      headerText = "You can't add more products"
+      contentText = "In order to add this product, first delete some older one"
 
     def readNotifications: List[Notification] =
       val source = Source.fromFile("jsonFileNotif.txt")
@@ -159,6 +165,10 @@ object RentigAppGui extends JFXApp3:
     //Dividing screen to 2 Vboxes
     val rightBox = VBox()
     val leftBox = VBox()
+    val nextAndPrevButtons = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing
+      this.setAlignment(Pos.BottomCenter)
 
     view1.add(leftBox, 0, 0, 1, 2)
     view1.add(rightBox, 1, 0, 1, 2)
@@ -175,11 +185,9 @@ object RentigAppGui extends JFXApp3:
     view1.columnConstraints = Array(column0, column1)
     view1.rowConstraints = Array(row0, row1)
 
-    // filling colors for background
+    // colors for background
     leftBox.background = Background.fill(Color.White)
     rightBox.background = Background.fill(Color.White)
-
-
 
     //LeftBox adjusting and children:
     leftBox.padding = standardPadding
@@ -193,21 +201,27 @@ object RentigAppGui extends JFXApp3:
     rightBox.padding = standardPadding
     rightBox.spacing = standardSpacing
     rightBox.setAlignment(Pos.BaselineCenter)
-    rightBox.children = Array(rightTitle, new Separator)
+    rightBox.children = Array(rightTitle, new Separator) ++ buttons1
 
     val productsTitle = new Label("Products"):
       font = new Font(25)
 
     val allProducts = new Button("All Products")
     allProducts.font = new Font(10)
-    val availableBut = new Button("Available")
+    val availableBut = new Button("Available today")
     availableBut.font = new Font(10)
-    val reservedBut = new Button("Reserved")
+    val reservedBut = new Button("Reserved today")
     reservedBut.font = new Font(10)
 
     val newNotificationLabel = new Label("Add new notification")
     val addNotification = new Button("Add")
     val newPackageLabel = new Label("Rent multiple products")
+    val nextPage1 = new Button("2->")
+    val nextPage2 = new Button("3->")
+    val nextPage3 = new Button("4->")
+    val previousPage2 = new Button("<-1")
+    val previousPage3 = new Button("<-2")
+    val previousPage4 = new Button("<-3")
 
     //Creating notification page
     val view2 = new VBox():
@@ -629,6 +643,8 @@ object RentigAppGui extends JFXApp3:
 
         rentMaker.rents += rent
         WriteToFile().writeRentToFile(rent)
+        nextAndPrevButtons.children = nextPage1
+        rightBox.children = Array(rightTitle, new Separator) ++ buttons1
         scene1.root = view1
         clearView3()
     end createNewRent
@@ -675,6 +691,8 @@ object RentigAppGui extends JFXApp3:
 
         rentMaker.rents ++= rents
         rents.foreach( r => WriteToFile().writeRentToFile(r) )
+        nextAndPrevButtons.children = nextPage1
+        rightBox.children = Array(rightTitle, new Separator) ++ buttons1
         scene1.root = view1
         clearView5()
         productPackage.clear()
@@ -682,17 +700,48 @@ object RentigAppGui extends JFXApp3:
 
 
     val deleteNotifButton = new Button("DELETE")
-    def deleteNotification(notification: Notification): Unit =
-      WriteToFile().deleteNotification(notification)
+
+
+    val packageDoneButton = new Button("Package Done"):
+      font = boldFont
+      this.setAlignment(Pos.BottomCenter)
+
+    val cancelPackageMaking = new Button("Cancel")
+
+    def addToPackage(notification: Notification): Unit =
+      productPackage += notification
+      println(s"added ${notification.name} to package")
+
+    def addPackageButtons() =
       var notifs = readNotifications
-      val buttons = notifs.map( _.button )
-      val notifsButtons = notifs.zip(buttons)
-      notifsButtons.foreach( (n,b) => b.onAction = (event) => makeRentPage(n))
-      rightBox.children = Array(rightTitle, new Separator) ++ buttons
-      scene1.root = view1
+      val packageButtons = notifs.map( _.button )
+      val pageSize = 6
+      val buttonsIn6Groups = packageButtons.grouped(pageSize).toBuffer
+      if packageButtons.isEmpty then
+          packageButtons
+      else if packageButtons.length <=6 then
+        buttons1 = buttonsIn6Groups.head.toBuffer
+      else if packageButtons.length <= 12 then
+        buttons1 = buttonsIn6Groups.head.toBuffer
+        buttons2 = buttonsIn6Groups(1).toBuffer
+      else if packageButtons.length <= 18 then
+        buttons1 = buttonsIn6Groups.head.toBuffer
+        buttons2 = buttonsIn6Groups(1).toBuffer
+        buttons3 = buttonsIn6Groups(2).toBuffer
+      else
+        buttons1 = buttonsIn6Groups.head.toBuffer
+        buttons2 = buttonsIn6Groups(1).toBuffer
+        buttons3 = buttonsIn6Groups(2).toBuffer
+        buttons4 = buttonsIn6Groups.last.toBuffer
+      val notifsButtons = notifs.zip(packageButtons)
+      notifsButtons.foreach( (n,b) => b.onAction = (event) => addToPackage(n))
+      rightBox.children = Array(rightTitle, new Separator) ++ buttons1
+      leftBox.children = Array(packageDoneButton, nextAndPrevButtons, cancelPackageMaking)
 
-
-    //val view6 = new VBox()
+    val startCreatingPackage = new Button("Create Package")
+    startCreatingPackage.onAction = (event) =>
+      nextAndPrevButtons.children = nextPage1
+      addPackageButtons()
 
     def updateView3(n: Notification): Unit =
       val selectedOption = chooseTimeBox.getValue
@@ -729,15 +778,6 @@ object RentigAppGui extends JFXApp3:
       chooseTimeBox.onAction = (event) => updateView3(n)
       startDate = n.calendarStart
       endDate = n.calendarEnd
-      val cale = n.cale
-      /*
-      val opencale = new Button("calendar")
-      val canc = new Button("Cancel")
-      opencale.onAction = (event) =>
-        view6.children = Array(cale, canc)
-        scene1.root = view6
-
-       */
 
       rentTitleBox.children = Array(rentTitleLabel, productName)
       rentDescriptionBox.children = Array(rentDescLabel, desc)
@@ -826,6 +866,16 @@ object RentigAppGui extends JFXApp3:
       createrPhone.text = ""
       createrAddress.text = ""
 
+
+    def deleteNotification(notification: Notification): Unit =
+      WriteToFile().deleteNotification(notification)
+      buttons1.clear()
+      buttons2.clear()
+      buttons3.clear()
+      buttons4.clear()
+      updateStartPage(true, false)
+      scene1.root = view1
+
     def createNewNotification(): Unit =
       // product info
       val ptitle = titleTxtField.text.value
@@ -860,92 +910,138 @@ object RentigAppGui extends JFXApp3:
       else
         val creator = User(name, address, phone)
         val notif = Notification(ptitle, creator, dayPrice.toDouble, hourPrice.toDouble, desc, category.value.value, amount.toInt, true)
-
-        creator.notifications += notif
-        allNotifications = (allNotifications :+ notif)
-        WriteToFile().writeNotifToFile(notif)
-        rightBox.children += notif.button
         notif.button.onAction = (event) => makeRentPage(notif)
 
-        scene1.root = view1
-        clearView2()
+        if readNotifications.length < 24 then
+          WriteToFile().writeNotifToFile(notif)
+          updateStartPage(true, false)
+          clearView2()
+        else
+          tooManyProductsAlert.showAndWait()
+          updateStartPage(true, false)
+          clearView2()
     end createNewNotification
 
-   
-    val submitButton = new Button("Submit")
-    submitButton.font = Font("System", FontWeight.Bold, 15)
-    submitButton.onAction = (event) =>
-      createNewNotification()
-    val cancelButton = new Button("Cancel")
-    cancelButton.onAction = (event) => scene1.root = view1
-    val submitBox = new HBox():
-      spacing = standardSpacing * 65
-      children = Array(cancelButton, submitButton)
-
-
-    cancelButton2.onAction = (event) =>
-      clearView3()
-      scene1.root = view1
-    cancelButton5.onAction = (event) =>
-      clearView5()
-      productPackage.clear()
-      scene1.root = view1
-
-
-    def addToPackage(notification: Notification): Unit =
-      productPackage += notification
-      println(s"added ${notification.name} to package")
-
-    val packageDoneButton = new Button("Package Done"):
-      font = boldFont
-      this.setAlignment(Pos.BottomCenter)
-
-    def addPackageButtons() =
-      val notifs = readNotifications
-      val packageButtons = notifs.map( _.button )
-      val notifsButtons = notifs.zip(packageButtons)
-      notifsButtons.foreach( (n,b) => b.onAction = (event) => addToPackage(n))
-      rightBox.children = Array(rightPackageTitle, new Separator) ++ packageButtons
-      leftBox.children = packageDoneButton
-
-
-    val startCreatingPackage = new Button("Create Package")
-    startCreatingPackage.onAction = (event) =>
-      addPackageButtons()
 
     // add from jsonFileNotif.txt wanted notifications to starting screen
     def updateStartPage(all: Boolean, available: Boolean): Unit =
+      buttons1.clear()
+      buttons2.clear()
+      buttons3.clear()
+      buttons4.clear()
       val today = LocalDate.now()
       var notifs = readNotifications
       if available then
         notifs = notifs.filterNot( _.allReservedDays.contains(today) )
-      else if !available && !all then
+      else if !all && !available then
         notifs = notifs.filter( _.allReservedDays.contains(today) )
       val buttons = notifs.map( _.button )
+      val pageSize = 6
+      val buttonsIn6Groups = buttons.grouped(pageSize).toBuffer
+      if buttons.isEmpty then
+          buttons
+      else if buttons.length <=6 then
+        buttons1 = buttonsIn6Groups.head.toBuffer
+      else if buttons.length <= 12 then
+        buttons1 = buttonsIn6Groups.head.toBuffer
+        buttons2 = buttonsIn6Groups(1).toBuffer
+      else if buttons.length <= 18 then
+        buttons1 = buttonsIn6Groups.head.toBuffer
+        buttons2 = buttonsIn6Groups(1).toBuffer
+        buttons3 = buttonsIn6Groups(2).toBuffer
+      else
+        buttons1 = buttonsIn6Groups.head.toBuffer
+        buttons2 = buttonsIn6Groups(1).toBuffer
+        buttons3 = buttonsIn6Groups(2).toBuffer
+        buttons4 = buttonsIn6Groups.last.toBuffer
       val notifsButtons = notifs.zip(buttons)
       notifsButtons.foreach( (n,b) => b.onAction = (event) => makeRentPage(n))
-      rightBox.children = Array(rightTitle, new Separator) ++ buttons
-      leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification, newPackageLabel, startCreatingPackage)
+      rightBox.children = Array(rightTitle, new Separator) ++ buttons1
+      leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification, newPackageLabel, startCreatingPackage, nextAndPrevButtons)
+      nextAndPrevButtons.children = nextPage1
+      scene1.root = view1
+    end updateStartPage
 
-    // Which products are shown in starting page
     allProducts.onAction = (event) => updateStartPage(true, false)
     availableBut.onAction = (event) => updateStartPage(false, true)
     reservedBut.onAction = (event) => updateStartPage(false, false)
+
+    cancelButton2.onAction = (event) =>
+      clearView3()
+      updateStartPage(true, false)
+    cancelButton5.onAction = (event) =>
+      clearView5()
+      productPackage.clear()
+      updateStartPage(true, false)
+    cancelPackageMaking.onAction = (event) =>
+      productPackage.clear()
+      updateStartPage(true, false)
+
+
+    val submitButton = new Button("Submit")
+    submitButton.font = Font("System", FontWeight.Bold, 15)
+    submitButton.onAction = (event) =>
+      nextAndPrevButtons.children = nextPage1
+      createNewNotification()
+    val cancelButton = new Button("Cancel")
+    cancelButton.onAction = (event) => updateStartPage(true, false)
+    val submitBox = new HBox():
+      spacing = standardSpacing * 65
+      children = Array(cancelButton, submitButton)
 
 
     packageDoneButton.onAction = (event) =>
       if productPackage.isEmpty then
         noProductsAlert.showAndWait()
       else
-        println("package is done")
         updateStartPage(true, false)
-        leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification,  newPackageLabel, startCreatingPackage)
         makeRentPageForPackage(productPackage)
 
     addNotification.onAction = (event) => scene1.root = view2
 
-    view2.children = Array(header, titleBox, descriptionBox, quantityBox, priceBox, categoryBox, new Separator, createrBoxHeader, createrBox, submitBox)
-    leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification,  newPackageLabel, startCreatingPackage)
+    nextPage1.onAction = (event) =>
+      rightBox.children = Array(rightTitle, new Separator) ++ buttons2
+      nextAndPrevButtons.children -= nextPage1
+      nextAndPrevButtons.children += previousPage2
+      nextAndPrevButtons.children += nextPage2
 
+    nextPage2.onAction = (event) =>
+      rightBox.children = Array(rightTitle, new Separator) ++ buttons3
+      nextAndPrevButtons.children -= previousPage2
+      nextAndPrevButtons.children -= nextPage2
+      nextAndPrevButtons.children += previousPage3
+      nextAndPrevButtons.children += nextPage3
+
+    nextPage3.onAction = (event) =>
+      rightBox.children = Array(rightTitle, new Separator) ++ buttons4
+      nextAndPrevButtons.children -= previousPage3
+      nextAndPrevButtons.children -= nextPage3
+      nextAndPrevButtons.children += previousPage4
+
+    previousPage2.onAction = (event) =>
+      rightBox.children = Array(rightTitle, new Separator) ++ buttons1
+      nextAndPrevButtons.children -= previousPage2
+      nextAndPrevButtons.children -= nextPage2
+      nextAndPrevButtons.children += nextPage1
+
+    previousPage3.onAction = (event) =>
+      rightBox.children = Array(rightTitle, new Separator) ++ buttons2
+      nextAndPrevButtons.children -= previousPage3
+      nextAndPrevButtons.children -= nextPage3
+      nextAndPrevButtons.children += previousPage2
+      nextAndPrevButtons.children += nextPage2
+
+    previousPage4.onAction = (event) =>
+      rightBox.children = Array(rightTitle, new Separator) ++ buttons3
+      nextAndPrevButtons.children -= previousPage4
+      nextAndPrevButtons.children += previousPage3
+      nextAndPrevButtons.children += nextPage3
+
+
+    nextAndPrevButtons.children = nextPage1
+    view2.children = Array(header, titleBox, descriptionBox, quantityBox, priceBox, categoryBox, new Separator, createrBoxHeader, createrBox, submitBox)
+    leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification,  newPackageLabel, startCreatingPackage, nextAndPrevButtons)
+
+    updateStartPage(true, false)
 
     stage.scene = scene1

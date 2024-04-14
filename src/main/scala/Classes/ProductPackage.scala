@@ -31,7 +31,7 @@ case class ProductPackage(notifications: mutable.Set[Notification]):
 
   def schedule =
     val rents = WriteToFile().readRentsFromFile.filter( r => notifications.contains(r.notification) )
-    val startDays = rents.map( _.startDay).toBuffer
+    val startDays = rents.map(  r => (r.startDay, r.notification.name) ).toBuffer
     val endDays = rents.map( _.endDay).toBuffer
     val startHours = rents.map( _.startHour).toBuffer
     val endHours = rents.map( _.endHour).toBuffer
@@ -45,26 +45,26 @@ case class ProductPackage(notifications: mutable.Set[Notification]):
         override def updateItem(item: LocalDate, empty: Boolean): Unit = {
           super.updateItem(item, empty)
           if (!empty && item != null) {
-          val rentedPeriods = schedule.filter(d => d._1._1.isEqual(item) || d._1._2.isEqual(item))
+          val rentedPeriods = schedule.filter(d => d._1._1._1.isEqual(item) || d._1._2.isEqual(item))
 
           if (rentedPeriods.nonEmpty) {
-            val tooltipText = rentedPeriods.map { case ((start, end), (startH, endH)) =>
-              if (start == end) s"Rented for: $startH-$endH"
-              else if (start == item) s"Rented from: $startH for the rest of the day"
-              else if (end == item) s"Rented until: $endH"
-              else "Rented for the whole day"
+            val tooltipText = rentedPeriods.map { case (((start,name), end), (startH, endH)) =>
+              if (start == end) s"$name is rented for: $startH-$endH"
+              else if (start == item) s"$name is rented from: $startH for the rest of the day"
+              else if (end == item) s"$name is rented until: $endH"
+              else s"$name is rented for the whole day"
             }.mkString("\n")
 
             setStyle("-fx-background-color: pink")
             setTooltip(new Tooltip(tooltipText))
           } else if (daysBetweenSandE.contains(item)) {
             setStyle("-fx-background-color: pink")
-            setTooltip(new Tooltip("Rented for the whole day"))
+            setTooltip(new Tooltip(s"Rented for the whole day"))
           } else {
-            setTooltip(new Tooltip("Available"))
+            setTooltip(new Tooltip(s"Available"))
           }
         } else {
-          setTooltip(new Tooltip("Available"))
+          setTooltip(new Tooltip(s"Available"))
         }
       }
     }
