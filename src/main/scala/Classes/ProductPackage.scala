@@ -5,6 +5,11 @@ import java.time.LocalDate
 import scala.collection.mutable
 import javafx.scene.control.{DateCell, DatePicker, Tooltip}
 
+/**
+ * Class for productpackages, basically same methods that notifications have but for calculating every this packages
+ * rented days and modifying calendar based on those days and times
+ * @param notifications notifications in this package
+ */
 case class ProductPackage(notifications: mutable.Set[Notification]):
 
   val combinedCalendarStart: scalafx.scene.control.DatePicker = new DatePicker()
@@ -72,3 +77,4 @@ case class ProductPackage(notifications: mutable.Set[Notification]):
 
   setCells(combinedCalendarStart)
   setCells(combinedCalendarEnd)
+end ProductPackage

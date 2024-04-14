@@ -49,10 +49,25 @@ class WriteToFile:
       case Right(notifications) => notifications
       case Left(_) => List.empty[Notification]
 
-    val updatedNotifications = currentNotifications.filterNot(_ == notification)
+    val updatedNotifications = currentNotifications.filterNot( _ == notification )
     val newList = updatedNotifications.asJson.spaces2
 
     val writer = new PrintWriter(new File("jsonFileNotif.txt"))
+    writer.write(newList)
+    writer.close()
+    
+  def deleteRent(rent: Rent): Unit =
+    val source = Source.fromFile("jsonFileRent.txt")
+    val currentList = try source.mkString finally source.close()
+
+    val currentRents = decode[List[Rent]](currentList) match
+      case Right(rents) => rents
+      case Left(_) => List.empty[Rent]
+
+    val updatedRents = currentRents.filterNot( _ == rent )
+    val newList = updatedRents.asJson.spaces2
+
+    val writer = new PrintWriter(new File("jsonFileRent.txt"))
     writer.write(newList)
     writer.close()
 

@@ -7,15 +7,38 @@ import java.time.LocalDate
 import scala.collection.mutable
 import javafx.scene.control.{DateCell, DatePicker, Tooltip}
 
-case class Notification(name: String, publisher: User, pricePerDay: Double, pricePerHour: Double, description: String, category: Category, amount: Int, var available: Boolean):
+/**
+ * Class representing notification
+ * @param name name of this notifiaction
+ * @param publisher user who made this notifiaction
+ * @param pricePerDay price for one day
+ * @param pricePerHour pricar for one hour
+ * @param description some text of this product
+ * @param category for what category is this product
+ * @param amount how many of this product's are
+ */
+case class Notification(name: String, publisher: User, pricePerDay: Double, pricePerHour: Double, description: String, category: Category, amount: Int):
 
+  /**
+   * Two calendars of this product to be shown when making a rent of this notification
+   */
   val calendarStart: scalafx.scene.control.DatePicker = new DatePicker()
   val calendarEnd: scalafx.scene.control.DatePicker = new DatePicker()
 
+  /**
+   * Counts every day between given days
+   * @param s start day
+   * @param e end day
+   * @return buffer of days between s and e
+   */
   def countDays(s: LocalDate, e: LocalDate): mutable.Buffer[LocalDate] =
     val count = java.time.temporal.ChronoUnit.DAYS.between(s,e)
     (0L to count).map(s.plusDays).toBuffer
 
+  /**
+   * Gives days between every this notifications rents start and end day
+   * @return buffer of these middle of rent days
+   */
   def daysBetweenSandE: mutable.Buffer[LocalDate] =
     //reserved days but not including start and end days
     val rents = WriteToFile().readRentsFromFile.filter( _.notification == this )
@@ -24,6 +47,10 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
     val startWend = startDays.zip(endDays)
     startWend.flatMap( i => countDays(i._1, i._2) ).filterNot( d => startDays.contains(d) || endDays.contains(d) )
 
+  /**
+   * Gives all reserved days of this product including start and end days
+   * @return buffer of all reserved days
+   */
   def allReservedDays: mutable.Buffer[LocalDate] =
     val rents = WriteToFile().readRentsFromFile.filter( _.notification == this )
     val startDays = rents.map( _.startDay).toBuffer
@@ -31,6 +58,11 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
     val startWend = startDays.zip(endDays)
     startWend.flatMap( i => countDays(i._1, i._2) )
 
+  /**
+   * Brings together this notifications rents' start days, end days, name, start hour and end hour.
+   * This way its easy to show in calendar start and end times of this notifs rents
+   * @return buffer
+   */
   def schedule =
     val rents = WriteToFile().readRentsFromFile.filter( _.notification == this )
     val startDays = rents.map(  r => (r.startDay, r.notification.name) ).toBuffer
@@ -41,6 +73,11 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
     val hours = startHours.zip(endHours)
     days.zip(hours)
 
+  /**
+   * Modifies given calendar days (cells) to pink if its rented for that day and shows message for
+   * detailed information of particular rent start and end times
+   * @param calendar calendar that will be modified
+   */
   def setCells(calendar: DatePicker): Unit =
     calendar.setDayCellFactory(new Callback[DatePicker, DateCell] {
       override def call(param: DatePicker): DateCell = new DateCell() {
@@ -71,12 +108,17 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
     }
   })
 
+  /**
+   * modifie this notifications calendars
+   */
   setCells(calendarStart)
   setCells(calendarEnd)
 
-  val damages = mutable.Buffer[String]()
   var comments = mutable.Buffer[String]()
 
+  /**
+   * Button to be shown at starting page
+   */
   val seeMoreButton = new Button(s"$name ${"\n"}Price/day: ${pricePerDay.toString}€, Price/hour: ${pricePerHour.toString}€")
   seeMoreButton.minHeight = 60
   seeMoreButton.minWidth = 250
