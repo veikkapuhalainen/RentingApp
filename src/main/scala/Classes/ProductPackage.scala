@@ -1,20 +1,14 @@
 package Classes
-
 import scalafx.Includes.*
-import scalafx.scene.control.Button
 import javafx.util.Callback
-
 import java.time.LocalDate
 import scala.collection.mutable
-import com.calendarfx.view.CalendarView
 import javafx.scene.control.{DateCell, DatePicker, Tooltip}
-import scalafx.scene.Node
 
-case class Notification(name: String, publisher: User, pricePerDay: Double, pricePerHour: Double, description: String, category: Category, amount: Int, var available: Boolean):
+case class ProductPackage(notifications: mutable.Set[Notification]):
 
-  val calendarStart: scalafx.scene.control.DatePicker = new DatePicker()
-  val calendarEnd: scalafx.scene.control.DatePicker = new DatePicker()
-  val cale: Node = new CalendarView()
+  val combinedCalendarStart: scalafx.scene.control.DatePicker = new DatePicker()
+  val combinedCalendarEnd: scalafx.scene.control.DatePicker = new DatePicker()
 
   def countDays(s: LocalDate, e: LocalDate): mutable.Buffer[LocalDate] =
     val count = java.time.temporal.ChronoUnit.DAYS.between(s,e)
@@ -22,21 +16,21 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
 
   def daysBetweenSandE: mutable.Buffer[LocalDate] =
     //reserved days but not including start and end days
-    val rents = WriteToFile().readRentsFromFile.filter( _.notification == this )
+    val rents = WriteToFile().readRentsFromFile.filter( r => notifications.contains(r.notification) )
     val startDays = rents.map( _.startDay).toBuffer
     val endDays = rents.map( _.endDay).toBuffer
     val startWend = startDays.zip(endDays)
     startWend.flatMap( i => countDays(i._1, i._2) ).filterNot( d => startDays.contains(d) || endDays.contains(d) )
 
   def allReservedDays: mutable.Buffer[LocalDate] =
-    val rents = WriteToFile().readRentsFromFile.filter( _.notification == this )
+    val rents = WriteToFile().readRentsFromFile.filter( r => notifications.contains(r.notification) )
     val startDays = rents.map( _.startDay).toBuffer
     val endDays = rents.map( _.endDay).toBuffer
     val startWend = startDays.zip(endDays)
     startWend.flatMap( i => countDays(i._1, i._2) )
 
   def schedule =
-    val rents = WriteToFile().readRentsFromFile.filter( _.notification == this )
+    val rents = WriteToFile().readRentsFromFile.filter( r => notifications.contains(r.notification) )
     val startDays = rents.map( _.startDay).toBuffer
     val endDays = rents.map( _.endDay).toBuffer
     val startHours = rents.map( _.startHour).toBuffer
@@ -76,18 +70,5 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
     }
   })
 
-  setCells(calendarStart)
-  setCells(calendarEnd)
-
-  val damages = mutable.Buffer[String]()
-  var comments = mutable.Buffer[String]()
-
-  val seeMoreButton = new Button(s"$name ${"\n"}Price/day: ${pricePerDay.toString}€, Price/hour: ${pricePerHour.toString}€")
-  seeMoreButton.minHeight = 50
-  seeMoreButton.minWidth = 70
-
-  def button = seeMoreButton
-
-  override def toString: String = s"Title: $name, Publisher: $publisher, Price(day): ${pricePerDay}e, Price(hour): ${pricePerHour}e, " +
-    s"Desc: $description, Category: $category"
-end Notification
+  setCells(combinedCalendarStart)
+  setCells(combinedCalendarEnd)

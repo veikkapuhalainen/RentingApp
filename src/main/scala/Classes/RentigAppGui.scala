@@ -4,31 +4,21 @@ import io.circe.Error
 import io.circe.parser.{decode, *}
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
-import scalafx.beans.property.ObjectProperty
-import scalafx.collections.{ObservableBuffer, ObservableBufferBase}
-import scalafx.geometry.{Insets, Orientation, Pos}
+import scalafx.collections.ObservableBuffer
+import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.{Scene, control}
 import scalafx.scene.control.*
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.layout.*
 import scalafx.scene.paint.Color
-import scalafx.scene.paint.Color.White
 import scalafx.scene.text.{Font, FontWeight}
 
 import scala.collection.mutable.ListBuffer
 import io.circe.generic.auto.*
-import cats.syntax.either.*
 import io.circe.*
-import io.circe.syntax.*
-import io.circe.generic.auto.*
-
 import scala.io.Source
-import java.util
-import java.util.{Calendar, Date}
 import java.time.*
-import java.time.temporal.ChronoUnit
 import scala.collection.mutable
-import scalafx.Includes.jfxDatePicker2sfx
 
 
 object RentigAppGui extends JFXApp3:
@@ -334,7 +324,7 @@ object RentigAppGui extends JFXApp3:
       padding = standardPadding
       spacing = standardSpacing * 5
 
-    val packageRentTitleLabel = new Label("Title:")
+    val packageRentTitleLabel = new Label("Titles:")
     val packageRentTitleBox = new HBox():
       padding = standardPadding
       spacing = standardSpacing
@@ -345,7 +335,7 @@ object RentigAppGui extends JFXApp3:
       padding = standardPadding
       spacing = standardSpacing
 
-    val packageRentDescLabel = new Label("Description:")
+    val packageRentDescLabel = new Label("Descriptions:")
     packageRentDescLabel.padding = standardPadding
     val packageRentDescriptionBox = new HBox():
       padding = standardPadding
@@ -356,14 +346,19 @@ object RentigAppGui extends JFXApp3:
       padding = standardPadding
       spacing = standardSpacing*3
 
+    val packageRentQuantityLabel = new Label("Quantity:")
+    val packageRentQuantityBox = new HBox():
+      padding = standardPadding
+      spacing = standardSpacing*3
+
     val rentPriceLabelDay = new Label("Price per day:")
     val rentPriceLabelHour = new Label("Price per hour:")
     val rentPriceBox = new HBox():
       padding = standardPadding
       spacing = standardSpacing
 
-    val packageRentPriceLabelDay = new Label("Price per day:")
-    val packageRentPriceLabelHour = new Label("Price per hour:")
+    val packageRentPriceLabelDay = new Label("Price's per day:")
+    val packageRentPriceLabelHour = new Label("Price's per hour:")
     val packageRentPriceBox = new HBox():
       padding = standardPadding
       spacing = standardSpacing
@@ -760,17 +755,16 @@ object RentigAppGui extends JFXApp3:
       new Separator, renterCalendarBox , new Separator, rentButtonBox)
 
 
-
     calendarBox.children = Array(calendarHeader, chooseTimeBox, startDateLabel, startDate, endDateLabel, endDate)
 
-    def updateView5(): Unit =
+    def updateView5(productPackage: ProductPackage): Unit =
       val selectedOption = packageChooseTimeBox.getValue
+      packageStartDate = productPackage.combinedCalendarStart
+      packageStartDateForHours = productPackage.combinedCalendarStart
+      packageEndDate = productPackage.combinedCalendarEnd
       selectedOption match
         case "For days" => packageCalendarBox.children = Array(packageCalendarHeader, packageChooseTimeBox, packageStartDateLabel, packageStartDate, packageEndDateLabel, packageEndDate)
         case "For hours" => packageCalendarBox.children = Array(packageCalendarHeader, packageChooseTimeBox, packageStartDateForHoursLabel, packageStartDateForHours, packageStartDateTime, packageEndDateTime)
-
-    packageChooseTimeBox.onAction = (event) => updateView5()
-    packageCalendarBox.children = Array(packageCalendarHeader, packageChooseTimeBox, packageStartDateLabel, packageStartDate, packageEndDateLabel, packageEndDate)
 
 
     def makeRentPageForPackage(notifs: mutable.Set[Notification]) =
@@ -778,9 +772,9 @@ object RentigAppGui extends JFXApp3:
       packageName.font = boldFont
       val packageDesc = new Label(s"${notifs.map(_.description).mkString(" || ")}")
       packageDesc.font = boldFont
-      val packagePriceDay = new Label(s"${notifs.map(_.pricePerDay).sum}")
+      val packagePriceDay = new Label(s"${notifs.map(_.pricePerDay).mkString("+")} = ${notifs.map(_.pricePerDay).sum}")
       packagePriceDay.font = boldFont
-      val packagePriceHour = new Label(s"${notifs.map(_.pricePerHour).sum}")
+      val packagePriceHour = new Label(s"${notifs.map(_.pricePerHour).mkString("+")} = ${notifs.map(_.pricePerHour).sum}")
       packagePriceHour.font = boldFont
       val packageQuantity = new Label(s"${notifs.map(_.amount).mkString(" || ")}")
       packageQuantity.font = boldFont
@@ -789,18 +783,29 @@ object RentigAppGui extends JFXApp3:
       val renterNames = new Label(s"${notifs.map(_.publisher.name).mkString("\n")}")
       renterNames.font = boldFont
       packageRentButton.onAction = (event) => createNewRentForPackage(notifs)
+      val products = ProductPackage(notifs)
+      val combinedCalendarStart = products.combinedCalendarStart
+      val combinedCalendarEnd = products.combinedCalendarEnd
+      packageStartDate = combinedCalendarStart
+      packageEndDate = combinedCalendarEnd
+      packageChooseTimeBox.onAction = (event) => updateView5(products)
 
       packageRentTitleBox.children = Array(packageRentTitleLabel, packageName)
       packageRentDescriptionBox.children = Array(packageRentDescLabel, packageDesc)
       packageRentPriceBox.children =  Array(packageRentPriceLabelDay, packagePriceDay, packageRentPriceLabelHour, packagePriceHour)
+      packageRentQuantityBox.children = Array(packageRentQuantityLabel, packageQuantity)
       packageRentCategoryBox.children = Array(packageRentCategoryLabel, packageCategories)
       packageRenterBox.children = Array(packageRenterHeader, packageRenternameLabel, renterNames)
+      packageCalendarBox.children = Array(packageCalendarHeader, packageChooseTimeBox, packageStartDateLabel, packageStartDate, packageEndDateLabel, packageEndDate)
       packageRenterCalendarBox.children = Array(packageRenterBox, packageCalendarBox, packageRentMakerBox)
       packageRentButtonBox.children = Array(cancelButton5, packageRentButton)
       scene1.root = view5
+    end makeRentPageForPackage
 
-    view5.children = Array(packageRentHeader, packageRentTitleBox, packageRentDescriptionBox, packageRentPriceBox, packageRentCategoryBox,
+    view5.children = Array(packageRentHeader, packageRentTitleBox, packageRentDescriptionBox, packageRentQuantityBox, packageRentPriceBox, packageRentCategoryBox,
       new Separator, packageRenterCalendarBox , new Separator, packageRentButtonBox)
+
+    packageCalendarBox.children = Array(packageCalendarHeader, packageChooseTimeBox, packageStartDateLabel, packageStartDate, packageEndDateLabel, packageEndDate)
 
     def makeCommentsPage(n: Notification): Unit =
       val allComments = new Label(n.comments.mkString("\n"))
