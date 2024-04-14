@@ -701,8 +701,9 @@ object RentigAppGui extends JFXApp3:
 
     def updateView3(n: Notification): Unit =
       val selectedOption = chooseTimeBox.getValue
-      startDate = n.calendar
-      startDateForHours = n.calendar
+      startDate = n.calendarStart
+      endDate = n.calendarEnd
+      startDateForHours = n.calendarStart
       selectedOption match
         case "For days" => calendarBox.children = Array(calendarHeader, chooseTimeBox, startDateLabel, startDate, endDateLabel, endDate)
         case "For hours" => calendarBox.children = Array(calendarHeader, chooseTimeBox, startDateForHoursLabel, startDateForHours, startDateTime, endDateTime)
@@ -731,7 +732,8 @@ object RentigAppGui extends JFXApp3:
       seeComments.onAction = (event) => makeCommentsPage(n)
       deleteNotifButton.onAction = (event) => deleteNotification(n)
       chooseTimeBox.onAction = (event) => updateView3(n)
-      startDate = n.calendar
+      startDate = n.calendarStart
+      endDate = n.calendarEnd
       val cale = n.cale
       /*
       val opencale = new Button("calendar")
