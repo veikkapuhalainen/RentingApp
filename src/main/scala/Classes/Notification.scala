@@ -14,8 +14,6 @@ import scalafx.scene.Node
 
 case class Notification(name: String, publisher: User, pricePerDay: Double, pricePerHour: Double, description: String, category: Category, amount: Int, var available: Boolean):
 
-  val startAndEndDays = mutable.Buffer[(LocalDate, LocalDate)]()
-
   val calendar: scalafx.scene.control.DatePicker = new DatePicker()
   val cale: Node = new CalendarView()
 
@@ -23,16 +21,20 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
     val count = java.time.temporal.ChronoUnit.DAYS.between(s,e)
     (0L to count).map(s.plusDays).toBuffer
 
-  def getRents =
-    WriteToFile().readRentsFromFile.filter( _.notification == this )
-
-  def reservedDays: mutable.Buffer[LocalDate] =
-    //not including start and end days
+  def daysBetweenSandE: mutable.Buffer[LocalDate] =
+    //reserved days but not including start and end days
     val rents = WriteToFile().readRentsFromFile.filter( _.notification == this )
     val startDays = rents.map( _.startDay).toBuffer
     val endDays = rents.map( _.endDay).toBuffer
     val startWend = startDays.zip(endDays)
     startWend.flatMap( i => countDays(i._1, i._2) ).filterNot( d => startDays.contains(d) || endDays.contains(d) )
+  
+  def allReservedDays: mutable.Buffer[LocalDate] =
+    val rents = WriteToFile().readRentsFromFile.filter( _.notification == this )
+    val startDays = rents.map( _.startDay).toBuffer
+    val endDays = rents.map( _.endDay).toBuffer
+    val startWend = startDays.zip(endDays)
+    startWend.flatMap( i => countDays(i._1, i._2) )
 
   def schedule =
     val rents = WriteToFile().readRentsFromFile.filter( _.notification == this )
@@ -49,43 +51,40 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
     override def call(param: DatePicker): DateCell = new DateCell() {
       override def updateItem(item: LocalDate, empty: Boolean): Unit = {
         super.updateItem(item, empty)
+        if (!empty && item != null) {
+        val rentedPeriods = schedule.filter(d => d._1._1.isEqual(item) || d._1._2.isEqual(item))
 
-        if (!empty && item != null && ((schedule.exists( d => item.isEqual(d._1._1) && item.isEqual(d._1._2) )))) {
-          val i = schedule.indexWhere( d => item.isEqual(d._1._1) && item.isEqual(d._1._2))
+        if (rentedPeriods.nonEmpty) {
+          val tooltipText = rentedPeriods.map { case ((start, end), (startH, endH)) =>
+            if (start == end) s"Rented for: $startH-$endH"
+            else if (start == item) s"Rented from: $startH for the rest of the day"
+            else if (end == item) s"Rented until: $endH"
+            else "Rented for the whole day"
+          }.mkString("\n")
+
           setStyle("-fx-background-color: pink")
-          setTooltip(new Tooltip(s"Rented for: ${schedule(i)._2._1}-${schedule(i)._2._2}"))
-        }
-        else if (!empty && item != null && ((schedule.exists( d => item.isEqual(d._1._1) )))) then
-          val i = schedule.indexWhere( d => item.isEqual(d._1._1) )
-          setStyle("-fx-background-color: pink")
-          setTooltip(new Tooltip(s"Rented from: ${schedule(i)._2._1} for the whole day"))
-        else if (!empty && item != null && ((schedule.exists( d => item.isEqual(d._1._2 )))) ) then
-          val i = schedule.indexWhere( d => item.isEqual(d._1._2) )
-          setStyle("-fx-background-color: pink")
-          setTooltip(new Tooltip(s"Rented until: ${schedule(i)._2._2}"))
-        else if (!empty && item != null && reservedDays.contains(item) ) then
+          setTooltip(new Tooltip(tooltipText))
+        } else if (daysBetweenSandE.contains(item)) {
           setStyle("-fx-background-color: pink")
           setTooltip(new Tooltip("Rented for the whole day"))
-        else
+        } else {
           setTooltip(new Tooltip("Available"))
+        }
+      } else {
+        setTooltip(new Tooltip("Available"))
       }
     }
-  })
+  }
+})
 
 
   val damages = mutable.Buffer[String]()
   var comments = mutable.Buffer[String]()
 
-
   val seeMoreButton = new Button(s"$name ${"\n"}Price/day: ${pricePerDay.toString}€, Price/hour: ${pricePerHour.toString}€")
   seeMoreButton.minHeight = 50
   seeMoreButton.minWidth = 70
 
-  val addToPackageButton = new Button(s"$name ${"\n"}Price/day: ${pricePerDay.toString}€, Price/hour: ${pricePerHour.toString}€")
-  addToPackageButton.minHeight = 50
-  addToPackageButton.minWidth = 70
-  
-  def packageButton = addToPackageButton
   def button = seeMoreButton
 
   override def toString: String = s"Title: $name, Publisher: $publisher, Price(day): ${pricePerDay}e, Price(hour): ${pricePerHour}e, " +
