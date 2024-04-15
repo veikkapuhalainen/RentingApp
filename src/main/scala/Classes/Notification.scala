@@ -25,6 +25,16 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
   val calendarStart: scalafx.scene.control.DatePicker = new DatePicker()
   val calendarEnd: scalafx.scene.control.DatePicker = new DatePicker()
 
+  def left(rented: Int) =
+    this.amount - rented
+
+  def rentedDaysAndAmount: Unit =
+    val rents = WriteToFile().readRentsFromFile.filter( _.notification == this )
+    val startDays = rents.map( _.startDay).toBuffer
+    val endDays = rents.map( _.endDay).toBuffer
+    val quantitys  = rents.map( _.amount )
+    val startWendWQúant = startDays.zip(endDays).zip(quantitys)
+
   /**
    * Counts every day between given days
    * @param s start day
@@ -65,7 +75,7 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
    */
   def schedule =
     val rents = WriteToFile().readRentsFromFile.filter( _.notification == this )
-    val startDays = rents.map(  r => (r.startDay, r.notification.name) ).toBuffer
+    val startDays = rents.map(  r => (r.startDay, r.amount) ).toBuffer
     val endDays = rents.map( _.endDay).toBuffer
     val startHours = rents.map( _.startHour).toBuffer
     val endHours = rents.map( _.endHour).toBuffer
@@ -81,30 +91,27 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
   def setCells(calendar: DatePicker): Unit =
     calendar.setDayCellFactory(new Callback[DatePicker, DateCell] {
       override def call(param: DatePicker): DateCell = new DateCell() {
-        override def updateItem(item: LocalDate, empty: Boolean): Unit = {
+        override def updateItem(item: LocalDate, empty: Boolean): Unit =
           super.updateItem(item, empty)
-          if (!empty && item != null) {
-          val rentedPeriods = schedule.filter(d => d._1._1._1.isEqual(item) || d._1._2.isEqual(item))
-          if (rentedPeriods.nonEmpty) {
-            val tooltipText = rentedPeriods.map { case (((start,name), end), (startH, endH)) =>
-              if (start == end) s"$name is rented for: $startH-$endH"
-              else if (start == item) s"$name is rented from: $startH for the rest of the day"
-              else if (end == item) s"$name is rented until: $endH"
-              else s"$name is rented for the whole day"
-            }.mkString("\n")
+          if (!empty && item != null) then
+            val rentedPeriods = schedule.filter(d => d._1._1._1.isEqual(item) || d._1._2.isEqual(item))
+            if (rentedPeriods.nonEmpty) then
+              val tooltipText = rentedPeriods.map( (i,j) =>
+                if (i._1._1 == i._2) then s"${i._1._2} X $name is rented for: ${j._1}-${j._2}"
+                else if (i._1._1 == item) then s"${i._1._2} X $name is rented from: ${j._1} for the rest of the day"
+                else if (i._2 == item) then s"${i._1._2} X $name is rented until: ${j._2}"
+                else s"${i._1._2} X $name is rented for the whole day"
+              ).mkString("\n")
 
-            setStyle("-fx-background-color: pink")
-            setTooltip(new Tooltip(tooltipText))
-          } else if (daysBetweenSandE.contains(item)) {
-            setStyle("-fx-background-color: pink")
-            setTooltip(new Tooltip(s"$name is rented for the whole day"))
-          } else {
+              setStyle("-fx-background-color: pink")
+              setTooltip(new Tooltip(tooltipText))
+            else if (daysBetweenSandE.contains(item)) then
+              setStyle("-fx-background-color: pink")
+              setTooltip(new Tooltip(s"Product $name is rented for the whole day"))
+            else
+              setTooltip(new Tooltip(s"$name is available"))
+          else
             setTooltip(new Tooltip(s"$name is available"))
-          }
-        } else {
-          setTooltip(new Tooltip(s"$name is available"))
-        }
-      }
     }
   })
 

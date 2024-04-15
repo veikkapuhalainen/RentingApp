@@ -14,7 +14,11 @@ import scalafx.scene.paint.Color
 import scalafx.scene.text.{Font, FontWeight}
 import io.circe.generic.auto.*
 import io.circe.*
+import javafx.collections
+import javafx.collections.ObservableList
+import scalafx.geometry.Pos.BottomCenter
 import scalafx.scene.control.Control.sfxControl2jfx
+
 import scala.io.Source
 import java.time.*
 import scala.collection.mutable
@@ -22,7 +26,7 @@ import scala.collection.mutable
 object RentigAppGui extends JFXApp3:
 
   val UIWidth = 800
-  val UIHeight = 600
+  val UIHeight = 630
   val standardPadding = Insets.apply(5, 5, 5, 5)
   val standardSpacing = 10
 
@@ -46,6 +50,7 @@ object RentigAppGui extends JFXApp3:
       height = UIHeight
       resizable = false
 
+    //Main page
     val view1 = GridPane()
 
     val scene1 = new Scene(parent = view1)
@@ -116,25 +121,25 @@ object RentigAppGui extends JFXApp3:
     def checkRentDays(notifications: mutable.Set[Notification], startDay: LocalDate, endDay: LocalDate, startH: Int, endH: Int): Boolean =
       val now = LocalDate.now()
       val existingRents = readRents.filter( r => notifications.contains(r.notification) )
-      val startDays = existingRents.map( _.startDay )
+      val startDays = existingRents.map( r => (r.startDay, r.amount) )
       val endDays = existingRents.map( _.endDay )
       val startHours = existingRents.map( _.startHour )
       val endHours = existingRents.map( _.endHour )
       val hours = startHours.zip(endHours)
       val startDaysWhours = startDays.zip(startHours.zip(endHours))
       val startsWends = startDays.zip(endDays)
-      val overLapDays = startsWends.exists( (s,e) => (startDay.isBefore(s) && endDay.isAfter(s)) || (startDay.isAfter(s) && endDay.isBefore(e)) || (startDay.isBefore(e) && endDay.isAfter(e)) )
-      val overLapHours = startsWends.zip(hours).exists( (d,h) => (d._1.isEqual(startDay) && startH < h._2) || (d._2.isEqual(endDay)) || (d._1.isEqual(startDay) && d._2.isEqual(endDay) || (!(d._1.isEqual(d._2)) && (startDay.isEqual(d._2)) )))
 
       if startDay == null || endDay == null then
         true
       else if startDay.isBefore(now) || endDay.isBefore(startDay) then
         true
-      else if overLapDays || overLapHours then
+      else if startsWends.exists( (s,e) => (startDay.isBefore(s._1) && endDay.isAfter(s._1)) || (startDay.isAfter(s._1) && endDay.isBefore(e)) || (startDay.isBefore(e) && endDay.isAfter(e)) ) ||
+         startsWends.zip(hours).exists( (d,h) => (d._1._1.isEqual(startDay) && startH < h._2) || (d._2.isEqual(endDay)) || (d._1._1.isEqual(startDay) && d._2.isEqual(endDay) || (!(d._1._1.isEqual(d._2)) && (startDay.isEqual(d._2)) ))) then
         true
       else
         false
     end checkRentDays
+
 
     /**
      * Check if for given notifications the given start and end days are possible to make a rent for. This method is for situations
@@ -150,7 +155,7 @@ object RentigAppGui extends JFXApp3:
       val hourNow = LocalTime.now().getHour
 
       val existingRents = readRents.filter( r => notifications.contains(r.notification) )
-      val startDays = existingRents.map( _.startDay )
+      val startDays = existingRents.map( r => (r.startDay,r.amount) )
       val endDays = existingRents.map( _.endDay )
       val startHours = existingRents.map( _.startHour )
       val endHours = existingRents.map( _.endHour )
@@ -159,10 +164,6 @@ object RentigAppGui extends JFXApp3:
       val endDaysWhours = endDays.zip(startHours.zip(endHours))
       val startsWends = startDays.zip(endDays)
       val daysAndHours = startsWends.zip(hours)
-
-      val overLapDays = startsWends.exists( (s,e) => (date.isAfter(s) && date.isBefore(e)) )
-      val overLapHours = daysAndHours.exists( (d,h) => (d._1.isEqual(date) && !(d._2.isEqual(date)) && endHour.toInt > h._1) || (!(d._1.isEqual(date)) && d._2.isEqual(date))
-        || (d._1.isEqual(date) && d._2.isEqual(date) && (((startHour.toInt < h._1) && (endHour.toInt > h._1)) || ((startHour.toInt > h._1) && (endHour.toInt < h._2)) || ((startHour.toInt < h._2) && (endHour.toInt > h._2)) )))
       var inCorrectValue: Boolean = false
 
       for i <- 0 until startHour.length do
@@ -176,7 +177,8 @@ object RentigAppGui extends JFXApp3:
         true
       else if date.isBefore(dateToday) || startHour.toInt == endHour.toInt || startHour.toInt > endHour.toInt || (date.isEqual(dateToday) && startHour.toInt < hourNow) then
         true
-      else if overLapDays || overLapHours then
+      else if startsWends.exists( (s,e) => (date.isAfter(s._1) && date.isBefore(e)) ) || daysAndHours.exists( (d,h) => (d._1._1.isEqual(date) && !(d._2.isEqual(date)) && endHour.toInt > h._1) || (!(d._1._1.isEqual(date)) && d._2.isEqual(date))
+        || (d._1._1.isEqual(date) && d._2.isEqual(date) && (((startHour.toInt < h._1) && (endHour.toInt > h._1)) || ((startHour.toInt > h._1) && (endHour.toInt < h._2)) || ((startHour.toInt < h._2) && (endHour.toInt > h._2)) ))) then
         true
       else
         false
@@ -201,7 +203,7 @@ object RentigAppGui extends JFXApp3:
     val nextAndPrevButtons = new HBox():
       padding = standardPadding
       spacing = standardSpacing
-      this.setAlignment(Pos.BottomCenter)
+      this.setAlignment(Pos.TopCenter)
 
     view1.add(leftBox, 0, 0, 1, 2)
     view1.add(rightBox, 1, 0, 1, 2)
@@ -211,9 +213,9 @@ object RentigAppGui extends JFXApp3:
     val column1 = new ColumnConstraints:
       percentWidth = 80
     val row0 = new RowConstraints:
-      percentHeight = 15
+      percentHeight = 50
     val row1 = new RowConstraints:
-      percentHeight = 85
+      percentHeight = 50
 
     view1.columnConstraints = Array(column0, column1)
     view1.rowConstraints = Array(row0, row1)
@@ -257,6 +259,10 @@ object RentigAppGui extends JFXApp3:
     val previousPage2 = new Button("<-1")
     val previousPage3 = new Button("<-2")
     val previousPage4 = new Button("<-3")
+    val userDataTitle = new Label("Users and their rents"):
+      font = new Font(25)
+    val seeUsersRentsLabel = new Label("See All Users Rents")
+    val seeUsersRentsButton = new Button("Users' rents")
 
     //Notification creating page
     val view2 = new VBox():
@@ -496,7 +502,7 @@ object RentigAppGui extends JFXApp3:
 
     val packageRentButtonBox = new HBox():
       padding = Insets.apply(30,5,5,5)
-      spacing = standardSpacing * 55
+      spacing = standardSpacing * 58
       children = Array(cancelButton5, packageRentButton)
 
     val calendarBox = new VBox:
@@ -544,7 +550,7 @@ object RentigAppGui extends JFXApp3:
     val packageChooseTimeBox = new ChoiceBox[String](choicesForTime)
     packageChooseTimeBox.value = choicesForTime.head
 
-    //DatePickers for making rent
+    //DatePickers for making rent for package
     var packageStartDate = new DatePicker()
     val packageStartDateLabel = new Label("Choose starting date:")
     var packageEndDate = new DatePicker()
@@ -638,6 +644,7 @@ object RentigAppGui extends JFXApp3:
       packageStartDate.value = null
       packageEndDate.value = null
       packageStartDateForHours.value = null
+      chooseTimeBox.value = choicesForTime.head
     end clearView5
 
     /**
@@ -693,8 +700,8 @@ object RentigAppGui extends JFXApp3:
       else if inCorrectValue || quantity.toInt > n.amount then
         inCorrectInputAlert.showAndWait()
       //see if user has made renting for days or hours and handle wrong inputs
-      else if (chooseTimeBox.value.value == choicesForTime.head && checkRentDays(mutable.Set(n), startingDate, endingDate, 0, 24)) ||
-        (chooseTimeBox.value.value == choicesForTime.last && checkRentHours(mutable.Set(n), startingDateHours, startHour, endHour)) then
+      else if (forDays && checkRentDays(mutable.Set(n), startingDate, endingDate, 0, 24)) ||
+        (forHours && checkRentHours(mutable.Set(n), startingDateHours, startHour, endHour)) then
         inValidDateAlert.showAndWait()
       else
         //Create rent and update page
@@ -706,7 +713,6 @@ object RentigAppGui extends JFXApp3:
           if forDays then startingDate else startingDateHours, if forDays then endingDate else startingDateHours,
           if forHours then startHour.toInt else 0, if forHours then endHour.toInt else 24, rentPrice)
 
-        rentMaker.rents += rent
         WriteToFile().writeRentToFile(rent)
         nextAndPrevButtons.children = nextPage1
         rightBox.children = Array(rightTitle, new Separator) ++ buttons1
@@ -746,8 +752,8 @@ object RentigAppGui extends JFXApp3:
       else if inCorrectValue then
         inCorrectInputAlert.showAndWait()
       //see if user has made renting for days or hours and handle wrong inputs
-      else if (chooseTimeBox.value.value == choicesForTime.head && checkRentDays(notifs, startingDate, endingDate, 0, 24)) ||
-        (chooseTimeBox.value.value == choicesForTime.last && checkRentHours(notifs, startingDateHours, startHour, endHour)) then
+      else if (forDays && checkRentDays(notifs, startingDate, endingDate, 0, 24)) ||
+        (forHours && checkRentHours(notifs, startingDateHours, startHour, endHour)) then
         inValidDateAlert.showAndWait()
       else
         val durationDays = if forDays then countDays(startingDate, endingDate) else 0
@@ -758,7 +764,6 @@ object RentigAppGui extends JFXApp3:
           if forDays then startingDate else startingDateHours, if forDays then endingDate else startingDateHours,
           if forHours then startHour.toInt else 0, if forHours then endHour.toInt else 24, rentPrice))
 
-        rentMaker.rents ++= rents
         rents.foreach( r => WriteToFile().writeRentToFile(r) )
         nextAndPrevButtons.children = nextPage1
         rightBox.children = Array(rightTitle, new Separator) ++ buttons1
@@ -811,7 +816,8 @@ object RentigAppGui extends JFXApp3:
         buttons4 = buttonsIn6Groups.last.toBuffer
       val notifsButtons = notifs.zip(packageButtons)
       notifsButtons.foreach( (n,b) => b.onAction = (event) => addToPackage(n))
-      rightBox.children = Array(rightTitle, new Separator) ++ buttons1
+      rightBox.children = Array(rightPackageTitle, new Separator) ++ buttons1
+      rightBox.setAlignment(Pos.BaselineCenter)
       leftBox.children = Array(packageDoneButton, nextAndPrevButtons, cancelPackageMaking)
     end addPackageButtons
 
@@ -823,7 +829,7 @@ object RentigAppGui extends JFXApp3:
 
     /**
      * Method to handle users option to rent product for days or hours. Different select updates calendarbox childrens
-     * in rent making page
+     * inside rent making page
      * @param n Notification which calendar is shown
      */
     def updateView3(n: Notification): Unit =
@@ -907,7 +913,7 @@ object RentigAppGui extends JFXApp3:
     def makeRentPageForPackage(notifs: mutable.Set[Notification]) =
       val packageName = new Label(s"${notifs.map(_.name).mkString(" || ")}")
       packageName.font = boldFont
-      val packageDesc = new Label(s"${notifs.map(_.description).mkString(" || ")}")
+      val packageDesc = new Label(s"${notifs.map(_.description).mkString("\n")}")
       packageDesc.font = boldFont
       val packagePriceDay = new Label(s"${notifs.map(_.pricePerDay).mkString("+")} = ${notifs.map(_.pricePerDay).sum}")
       packagePriceDay.font = boldFont
@@ -985,7 +991,6 @@ object RentigAppGui extends JFXApp3:
       buttons3.clear()
       buttons4.clear()
       updateStartPage(true, false)
-      scene1.root = view1
     end deleteNotification
 
     /**
@@ -1078,13 +1083,14 @@ object RentigAppGui extends JFXApp3:
       val notifsButtons = notifs.zip(buttons)
       notifsButtons.foreach( (n,b) => b.onAction = (event) => makeRentPage(n))
       rightBox.children = Array(rightTitle, new Separator) ++ buttons1
-      leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification, newPackageLabel, startCreatingPackage, nextAndPrevButtons)
+      rightBox.setAlignment(Pos.BaselineCenter)
+      leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification, newPackageLabel, startCreatingPackage, seeUsersRentsLabel, seeUsersRentsButton, nextAndPrevButtons)
       nextAndPrevButtons.children = nextPage1
       scene1.root = view1
     end updateStartPage
 
     /**
-     * Method that deletes rents from file if it has expired. This is done everytime app is opened
+     * Method that deletes rents from file if it has expired. This is checked everytime app is opened
      */
     def deleteExpiredRents(): Unit =
       val dayToday = LocalDate.now()
@@ -1103,8 +1109,8 @@ object RentigAppGui extends JFXApp3:
       clearView3()
       updateStartPage(true, false)
     cancelButton5.onAction = (event) =>
-      clearView5()
       productPackage.clear()
+      clearView5()
       updateStartPage(true, false)
     cancelPackageMaking.onAction = (event) =>
       productPackage.clear()
@@ -1130,7 +1136,22 @@ object RentigAppGui extends JFXApp3:
         updateStartPage(true, false)
         makeRentPageForPackage(productPackage)
 
+    /**
+     * Shows all users and their rents in a listView
+     */
+    def seeUserData(): Unit =
+      val usersWithRents = readRents.groupBy( _.whoRented ).map( i => (i._1.toString, i._2.map(_.toString)) ).toSeq
+      val asString = usersWithRents.flatMap( (user, rents) => user +: rents.map( r => s" - $r" ) )
+      val listView = new ListView[String]():
+        this.vgrow = Priority.Always
+      listView.getItems.addAll(asString*)
+      rightBox.children = Array(userDataTitle, new Separator, listView)
+      rightBox.setAlignment(Pos.BottomCenter)
+      leftBox.children -= nextAndPrevButtons
+    end seeUserData
+
     addNotification.onAction = (event) => scene1.root = view2
+    seeUsersRentsButton.onAction = (event) => seeUserData()
 
     //Next and previous page buttons onActions
     nextPage1.onAction = (event) =>
@@ -1173,10 +1194,11 @@ object RentigAppGui extends JFXApp3:
 
     nextAndPrevButtons.children = nextPage1
     view2.children = Array(header, titleBox, descriptionBox, quantityBox, priceBox, categoryBox, new Separator, createrBoxHeader, createrBox, submitBox)
-    leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification,  newPackageLabel, startCreatingPackage, nextAndPrevButtons)
+    leftBox.children = Array(productsTitle, allProducts, availableBut, reservedBut, newNotificationLabel, addNotification,  newPackageLabel, startCreatingPackage, seeUsersRentsLabel, seeUsersRentsButton, nextAndPrevButtons)
 
     //At beginning every expired rent is deleted and buttons are shown
     deleteExpiredRents()
     updateStartPage(true, false)
     
     stage.scene = scene1
+  end start

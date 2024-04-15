@@ -19,4 +19,4 @@ case class Rent(notification: Notification, whoRented: User, amount: Int, startD
 
   def addComment(comment: String): Unit = comments += comment
 
-  override def toString = s"Rented: ${notification.name}, who rented: $whoRented, amount: $amount, start: d:$startDay, h:$startHour, d:end: $endDay, h:$endHour, price: $price"
+  override def toString = s"Rented $amount time(s) ${notification.name} for ${price}€, Rented from: $startDay, KLO:$startHour, to $endDay, KLO:$endHour"
