@@ -15,9 +15,6 @@ case class ProductPackage(notifications: mutable.Set[Notification]):
   val combinedCalendarStart: scalafx.scene.control.DatePicker = new DatePicker()
   val combinedCalendarEnd: scalafx.scene.control.DatePicker = new DatePicker()
 
-  def left(rented: Int, n: Notification) =
-    n.amount - rented
-
   def countDays(s: LocalDate, e: LocalDate): mutable.Buffer[LocalDate] =
     val count = java.time.temporal.ChronoUnit.DAYS.between(s,e)
     (0L to count).map(s.plusDays).toBuffer

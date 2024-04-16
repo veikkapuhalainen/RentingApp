@@ -134,7 +134,7 @@ object RentigAppGui extends JFXApp3:
       else if startDay.isBefore(now) || endDay.isBefore(startDay) then
         true
       else if startsWends.exists( (s,e) => (startDay.isBefore(s._1) && endDay.isAfter(s._1)) || (startDay.isAfter(s._1) && endDay.isBefore(e)) || (startDay.isBefore(e) && endDay.isAfter(e)) ) ||
-         startsWends.zip(hours).exists( (d,h) => (d._1._1.isEqual(startDay) && startH < h._2) || (d._2.isEqual(endDay)) || (d._1._1.isEqual(startDay) && d._2.isEqual(endDay) || (!(d._1._1.isEqual(d._2)) && (startDay.isEqual(d._2)) ))) then
+         startsWends.zip(hours).exists( (d,h) => d._1._1.isEqual(startDay) || (d._2.isEqual(endDay)) || startDay.isEqual(d._2) || endDay.isEqual(d._1._1) ) then
         true
       else
         false

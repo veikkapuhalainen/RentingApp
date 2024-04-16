@@ -27,16 +27,6 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
 
   val comments = mutable.Buffer[String]()
 
-  def left(rented: Int) =
-    this.amount - rented
-
-  def rentedDaysAndAmount: Unit =
-    val rents = WriteToFile().readRentsFromFile.filter( _.notification == this )
-    val startDays = rents.map( _.startDay).toBuffer
-    val endDays = rents.map( _.endDay).toBuffer
-    val quantitys  = rents.map( _.amount )
-    val startWendWQúant = startDays.zip(endDays).zip(quantitys)
-
   /**
    * Counts every day between given days
    * @param s start day
@@ -84,6 +74,8 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
     val days = startDays.zip(endDays)
     val hours = startHours.zip(endHours)
     days.zip(hours)
+
+
 
   /**
    * Modifies given calendar days (cells) to pink if its rented for that day and shows message for

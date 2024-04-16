@@ -14,9 +14,5 @@ import scala.collection.mutable
  * @param price price of the rent
  */
 case class Rent(notification: Notification, whoRented: User, amount: Int, startDay: LocalDate, endDay: LocalDate, startHour: Int, endHour: Int, price: Double):
-  
-  val comments = mutable.Buffer[String]()
-
-  def addComment(comment: String): Unit = comments += comment
 
   override def toString = s"Rented $amount time(s) ${notification.name} for ${price}€, Rented from: $startDay, KLO:$startHour, to $endDay, KLO:$endHour"
