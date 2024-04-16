@@ -579,17 +579,20 @@ object RentigAppGui extends JFXApp3:
 
     val commentsHeader = new Label("Comments of this product")
     commentsHeader.font = Font("Arial", FontWeight.Bold, 20)
-    commentsHeader.setAlignment(Pos.BaselineCenter)
     val commentsHeaderBox = new HBox():
       spacing = standardSpacing
       this.setAlignment(Pos.BaselineCenter)
       children = commentsHeader
+    val allComments = new VBox():
+      padding = standardPadding
+      this.setAlignment(Pos.TopLeft)
 
     // Cancelbutton for comments page
     val cancelButton3 = new Button("Cancel")
 
     //stuff for comment making page
     val commentField = new TextField()
+    commentField.promptText = "Comment this product"
     val addCommentButton = new Button("Add Comment")
 
     val commentsButtonBox = new HBox():
@@ -610,8 +613,9 @@ object RentigAppGui extends JFXApp3:
       else
         n.comments += commentField.text.value
         commentField.text = ""
-        val allComments = new Label(n.comments.mkString("\n"))
-        view4.children = Array(commentsHeaderBox, allComments, commentField, commentsButtonBox)
+        allComments.children = new Label(n.comments.mkString("\n"))
+        scene1.root = view4
+        //view4.children = Array(commentsHeaderBox, allComments, commentField, commentsButtonBox)
     end addComment
 
     /**
@@ -957,14 +961,14 @@ object RentigAppGui extends JFXApp3:
      * @param n notification whose comments are shown and what is going to be commented
      */
     def makeCommentsPage(n: Notification): Unit =
-      val allComments = new Label(n.comments.mkString("\n"))
-      commentField.promptText = "Comment this product"
+      val comments = new Label(n.comments.mkString("\n"))
       cancelButton3.onAction = (event) => makeRentPage(n)
       addCommentButton.onAction = (event) => addComment(n)
-      view4.children = Array(commentsHeaderBox, allComments, commentField, commentsButtonBox)
+      allComments.children = comments
       scene1.root = view4
     end makeCommentsPage
 
+    view4.children = Array(commentsHeaderBox, allComments, commentField, commentsButtonBox)
     /**
      * Clears the notification creating page's textfields when notification has been made
      */

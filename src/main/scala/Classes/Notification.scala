@@ -25,6 +25,8 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
   val calendarStart: scalafx.scene.control.DatePicker = new DatePicker()
   val calendarEnd: scalafx.scene.control.DatePicker = new DatePicker()
 
+  val comments = mutable.Buffer[String]()
+
   def left(rented: Int) =
     this.amount - rented
 
@@ -90,24 +92,24 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
    */
   def setCells(calendar: DatePicker): Unit =
     calendar.setDayCellFactory(new Callback[DatePicker, DateCell] {
-      override def call(param: DatePicker): DateCell = new DateCell() {
-        override def updateItem(item: LocalDate, empty: Boolean): Unit =
-          super.updateItem(item, empty)
-          if (!empty && item != null) then
-            val rentedPeriods = schedule.filter(d => d._1._1._1.isEqual(item) || d._1._2.isEqual(item))
+      override def call(cal: DatePicker): DateCell = new DateCell() {
+        override def updateItem(date: LocalDate, empty: Boolean): Unit =
+          super.updateItem(date, empty)
+          if (!empty && date != null) then
+            val rentedPeriods = schedule.filter(d => d._1._1._1.isEqual(date) || d._1._2.isEqual(date))
             if (rentedPeriods.nonEmpty) then
               val tooltipText = rentedPeriods.map( (i,j) =>
                 if (i._1._1 == i._2) then s"${i._1._2} X $name is rented for: ${j._1}-${j._2}"
-                else if (i._1._1 == item) then s"${i._1._2} X $name is rented from: ${j._1} for the rest of the day"
-                else if (i._2 == item) then s"${i._1._2} X $name is rented until: ${j._2}"
+                else if (i._1._1 == date) then s"${i._1._2} X $name is rented from: ${j._1} for the rest of the day"
+                else if (i._2 == date) then s"${i._1._2} X $name is rented until: ${j._2}"
                 else s"${i._1._2} X $name is rented for the whole day"
               ).mkString("\n")
 
               setStyle("-fx-background-color: pink")
               setTooltip(new Tooltip(tooltipText))
-            else if (daysBetweenSandE.contains(item)) then
+            else if (daysBetweenSandE.contains(date)) then
               setStyle("-fx-background-color: pink")
-              setTooltip(new Tooltip(s"Product $name is rented for the whole day"))
+              setTooltip(new Tooltip(s"$name is rented for the whole day"))
             else
               setTooltip(new Tooltip(s"$name is available"))
           else
@@ -120,8 +122,6 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
    */
   setCells(calendarStart)
   setCells(calendarEnd)
-
-  var comments = mutable.Buffer[String]()
 
   /**
    * Button to be shown at starting page

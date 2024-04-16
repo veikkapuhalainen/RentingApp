@@ -17,7 +17,10 @@ class WriteToFile:
    * @param notification Notification to be writed to file
    */
   def writeNotifToFile(notification: Notification): Unit =
-    val source = Source.fromFile("jsonFileNotif.txt")
+    val file = new File("jsonFileNotif.txt")
+    if !(file.exists()) then
+      file.createNewFile()
+    val source = Source.fromFile(file)
     val currentList = try source.mkString finally source.close()
 
     val currentNotifications = decode[List[Notification]](currentList) match 
@@ -27,7 +30,7 @@ class WriteToFile:
     val newNotifications = currentNotifications :+ notification
     val newList = newNotifications.asJson.spaces2
 
-    val writer = new PrintWriter(new File("jsonFileNotif.txt"))
+    val writer = new PrintWriter(file)
     writer.write(newList)
     writer.close()
   end writeNotifToFile
@@ -38,7 +41,10 @@ class WriteToFile:
    * @param rent rent to be writed to file
    */
   def writeRentToFile(rent: Rent): Unit =
-    val source = Source.fromFile("jsonFileRent.txt")
+    val file = new File("jsonFileRent.txt")
+    if !(file.exists()) then
+      file.createNewFile()
+    val source = Source.fromFile(file)
     val currentList = try source.mkString finally source.close()
 
     val currentRents = decode[List[Rent]](currentList) match
@@ -48,7 +54,7 @@ class WriteToFile:
     val newRents = currentRents :+ rent
     val newList = newRents.asJson.spaces2
 
-    val writer = new PrintWriter(new File("jsonFileRent.txt"))
+    val writer = new PrintWriter(file)
     writer.write(newList)
     writer.close()
   end writeRentToFile
