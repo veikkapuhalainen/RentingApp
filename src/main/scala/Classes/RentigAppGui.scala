@@ -177,7 +177,7 @@ object RentigAppGui extends JFXApp3:
         true
       else if date.isBefore(dateToday) || startHour.toInt == endHour.toInt || startHour.toInt > endHour.toInt || (date.isEqual(dateToday) && startHour.toInt < hourNow) then
         true
-      else if startsWends.exists( (s,e) => (date.isAfter(s._1) && date.isBefore(e)) ) || daysAndHours.exists( (d,h) => (d._1._1.isEqual(date) && !(d._2.isEqual(date)) && endHour.toInt > h._1) || (!(d._1._1.isEqual(date)) && d._2.isEqual(date))
+      else if startsWends.exists( (s,e) => (date.isAfter(s._1) && date.isBefore(e)) ) || daysAndHours.exists( (d,h) => (d._1._1.isEqual(date) && !(d._2.isEqual(date))) || (!(d._1._1.isEqual(date)) && d._2.isEqual(date))
         || (d._1._1.isEqual(date) && d._2.isEqual(date) && (((startHour.toInt < h._1) && (endHour.toInt > h._1)) || ((startHour.toInt > h._1) && (endHour.toInt < h._2)) || ((startHour.toInt < h._2) && (endHour.toInt > h._2)) ))) then
         true
       else
