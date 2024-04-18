@@ -80,6 +80,16 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
   /**
    * Modifies given calendar days (cells) to pink if its rented for that day and shows message for
    * detailed information of particular rent start and end times
+   *
+   * !!!
+   * The core of this method was looked from stackoverflow under header "JavaFx DatePicker color single cell"
+   * What I did myself was that I changed this java code to scala so that datepicker could be added to vbox (scala datepicker didn't accept java callback and
+   * scala vbox didn't accept java datepicker etc.) I added my own logic (the way method handles rented days if they are start day, end day or middle day) and
+   * added own texts and color it shows. Also I modified this version to ProductPackage so that it does same thing but can handle multiple notifications once and
+   * modifies texts regarding the notification that is reserved.
+   * https://stackoverflow.com/questions/42542312/javafx-datepicker-color-single-cell
+   * !!!
+   *
    * @param calendar calendar that will be modified
    */
   def setCells(calendar: DatePicker): Unit =

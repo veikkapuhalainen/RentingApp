@@ -936,6 +936,7 @@ object RentigAppGui extends JFXApp3:
       packageStartDate = combinedCalendarStart
       packageEndDate = combinedCalendarEnd
       packageChooseTimeBox.onAction = (event) => updateView5(products)
+      packageChooseTimeBox.value = choicesForTime.head
 
       packageRentTitleBox.children = Array(packageRentTitleLabel, packageName)
       packageRentDescriptionBox.children = Array(packageRentDescLabel, packageDesc)
@@ -1094,7 +1095,7 @@ object RentigAppGui extends JFXApp3:
     end updateStartPage
 
     /**
-     * Method that deletes rents from file if it has expired. This is checked everytime app is opened
+     * Method that deletes rents from file if it has expired. Rent is expired if it's end time has gone. This is checked everytime app is opened
      */
     def deleteExpiredRents(): Unit =
       val dayToday = LocalDate.now()
