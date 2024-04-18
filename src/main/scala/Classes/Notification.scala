@@ -91,10 +91,10 @@ case class Notification(name: String, publisher: User, pricePerDay: Double, pric
             val rentedPeriods = schedule.filter(d => d._1._1._1.isEqual(date) || d._1._2.isEqual(date))
             if (rentedPeriods.nonEmpty) then
               val tooltipText = rentedPeriods.map( (i,j) =>
-                if (i._1._1 == i._2) then s"${i._1._2} X $name is rented for: ${j._1}-${j._2}"
-                else if (i._1._1 == date) then s"${i._1._2} X $name is rented from: ${j._1} for the rest of the day"
-                else if (i._2 == date) then s"${i._1._2} X $name is rented until: ${j._2}"
-                else s"${i._1._2} X $name is rented for the whole day"
+                if (i._1._1 == i._2) then s"${i._1._2}x $name is rented for: ${j._1}-${j._2}"
+                else if (i._1._1 == date) then s"${i._1._2}x $name is rented from: ${j._1} for the rest of the day"
+                else if (i._2 == date) then s"${i._1._2}x $name is rented until: ${j._2}"
+                else s"${i._1._2}x $name is rented for the whole day"
               ).mkString("\n")
 
               setStyle("-fx-background-color: pink")
