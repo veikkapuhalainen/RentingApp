@@ -1,0 +1,450 @@
+[
+  {
+    "notification" : {
+      "name" : "Volvo car",
+      "publisher" : {
+        "name" : "Mikko Mallikas",
+        "address" : "Autokatu 8",
+        "phoneNumber" : "045567899"
+      },
+      "pricePerDay" : 100.0,
+      "pricePerHour" : 20.0,
+      "description" : "2021 year volvo v70 color black",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Matti",
+      "address" : "Meikalainen",
+      "phoneNumber" : "044038372"
+    },
+    "amount" : 1,
+    "startDay" : "2025-09-10",
+    "endDay" : "2025-09-17",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 700.0
+  },
+  {
+    "notification" : {
+      "name" : "Volvo car",
+      "publisher" : {
+        "name" : "Mikko Mallikas",
+        "address" : "Autokatu 8",
+        "phoneNumber" : "045567899"
+      },
+      "pricePerDay" : 100.0,
+      "pricePerHour" : 20.0,
+      "description" : "2021 year volvo v70 color black",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Maija",
+      "address" : "Mehilainen",
+      "phoneNumber" : "0453728282"
+    },
+    "amount" : 1,
+    "startDay" : "2025-10-16",
+    "endDay" : "2025-10-19",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 435.0
+  },
+  {
+    "notification" : {
+      "name" : "Tennis racket",
+      "publisher" : {
+        "name" : "Veikka",
+        "address" : "Haukilahdenkatu 1",
+        "phoneNumber" : "0403237389"
+      },
+      "pricePerDay" : 20.0,
+      "pricePerHour" : 4.0,
+      "description" : "Wilson tennis racket from 2019 but still working well",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Maija",
+      "address" : "Mehilainen",
+      "phoneNumber" : "0453728282"
+    },
+    "amount" : 1,
+    "startDay" : "2025-10-16",
+    "endDay" : "2025-10-19",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 435.0
+  },
+  {
+    "notification" : {
+      "name" : "Mountain bike",
+      "publisher" : {
+        "name" : "Mikko",
+        "address" : "Tietokatu 1A",
+        "phoneNumber" : "044023478"
+      },
+      "pricePerDay" : 100.0,
+      "pricePerHour" : 20.0,
+      "description" : "Electric mountain bike",
+      "category" : {
+        "categoryName" : "Cycling"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Maija",
+      "address" : "Mehilainen",
+      "phoneNumber" : "0453728282"
+    },
+    "amount" : 1,
+    "startDay" : "2025-10-16",
+    "endDay" : "2025-10-19",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 435.0
+  },
+  {
+    "notification" : {
+      "name" : "Tennis balls",
+      "publisher" : {
+        "name" : "Veijo Kauppinen",
+        "address" : "Tietotie 4",
+        "phoneNumber" : "03003489438"
+      },
+      "pricePerDay" : 10.0,
+      "pricePerHour" : 3.0,
+      "description" : "10 balls total brand new",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Maija",
+      "address" : "Mehilainen",
+      "phoneNumber" : "0453728282"
+    },
+    "amount" : 1,
+    "startDay" : "2025-10-16",
+    "endDay" : "2025-10-19",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 435.0
+  },
+  {
+    "notification" : {
+      "name" : "Nike Tennis Shoes",
+      "publisher" : {
+        "name" : "Mikko",
+        "address" : "Tekniikkakatu 13",
+        "phoneNumber" : "040302928"
+      },
+      "pricePerDay" : 15.0,
+      "pricePerHour" : 5.0,
+      "description" : "Pretty old but clean nike tennis shoes size 41",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Maija",
+      "address" : "Mehilainen",
+      "phoneNumber" : "0453728282"
+    },
+    "amount" : 1,
+    "startDay" : "2025-10-16",
+    "endDay" : "2025-10-19",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 435.0
+  },
+  {
+    "notification" : {
+      "name" : "Volvo car",
+      "publisher" : {
+        "name" : "Mikko Mallikas",
+        "address" : "Autokatu 8",
+        "phoneNumber" : "045567899"
+      },
+      "pricePerDay" : 100.0,
+      "pricePerHour" : 20.0,
+      "description" : "2021 year volvo v70 color black",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Jaakko",
+      "address" : "Kultanen",
+      "phoneNumber" : "0442132889"
+    },
+    "amount" : 1,
+    "startDay" : "2025-11-18",
+    "endDay" : "2025-11-29",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 1595.0
+  },
+  {
+    "notification" : {
+      "name" : "Mountain bike",
+      "publisher" : {
+        "name" : "Mikko",
+        "address" : "Tietokatu 1A",
+        "phoneNumber" : "044023478"
+      },
+      "pricePerDay" : 100.0,
+      "pricePerHour" : 20.0,
+      "description" : "Electric mountain bike",
+      "category" : {
+        "categoryName" : "Cycling"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Jaakko",
+      "address" : "Kultanen",
+      "phoneNumber" : "0442132889"
+    },
+    "amount" : 1,
+    "startDay" : "2025-11-18",
+    "endDay" : "2025-11-29",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 1595.0
+  },
+  {
+    "notification" : {
+      "name" : "Tennis balls",
+      "publisher" : {
+        "name" : "Veijo Kauppinen",
+        "address" : "Tietotie 4",
+        "phoneNumber" : "03003489438"
+      },
+      "pricePerDay" : 10.0,
+      "pricePerHour" : 3.0,
+      "description" : "10 balls total brand new",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Jaakko",
+      "address" : "Kultanen",
+      "phoneNumber" : "0442132889"
+    },
+    "amount" : 1,
+    "startDay" : "2025-11-18",
+    "endDay" : "2025-11-29",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 1595.0
+  },
+  {
+    "notification" : {
+      "name" : "Tennis racket",
+      "publisher" : {
+        "name" : "Veikka",
+        "address" : "Haukilahdenkatu 1",
+        "phoneNumber" : "0403237389"
+      },
+      "pricePerDay" : 20.0,
+      "pricePerHour" : 4.0,
+      "description" : "Wilson tennis racket from 2019 but still working well",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Jaakko",
+      "address" : "Kultanen",
+      "phoneNumber" : "0442132889"
+    },
+    "amount" : 1,
+    "startDay" : "2025-11-18",
+    "endDay" : "2025-11-29",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 1595.0
+  },
+  {
+    "notification" : {
+      "name" : "Nike Tennis Shoes",
+      "publisher" : {
+        "name" : "Mikko",
+        "address" : "Tekniikkakatu 13",
+        "phoneNumber" : "040302928"
+      },
+      "pricePerDay" : 15.0,
+      "pricePerHour" : 5.0,
+      "description" : "Pretty old but clean nike tennis shoes size 41",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Jaakko",
+      "address" : "Kultanen",
+      "phoneNumber" : "0442132889"
+    },
+    "amount" : 1,
+    "startDay" : "2025-11-18",
+    "endDay" : "2025-11-29",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 1595.0
+  },
+  {
+    "notification" : {
+      "name" : "Tennis racket",
+      "publisher" : {
+        "name" : "Veikka",
+        "address" : "Haukilahdenkatu 1",
+        "phoneNumber" : "0403237389"
+      },
+      "pricePerDay" : 20.0,
+      "pricePerHour" : 4.0,
+      "description" : "Wilson tennis racket from 2019 but still working well",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Erkki",
+      "address" : "Esimerkki",
+      "phoneNumber" : "0408675499"
+    },
+    "amount" : 1,
+    "startDay" : "2025-12-20",
+    "endDay" : "2025-12-22",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 290.0
+  },
+  {
+    "notification" : {
+      "name" : "Mountain bike",
+      "publisher" : {
+        "name" : "Mikko",
+        "address" : "Tietokatu 1A",
+        "phoneNumber" : "044023478"
+      },
+      "pricePerDay" : 100.0,
+      "pricePerHour" : 20.0,
+      "description" : "Electric mountain bike",
+      "category" : {
+        "categoryName" : "Cycling"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Erkki",
+      "address" : "Esimerkki",
+      "phoneNumber" : "0408675499"
+    },
+    "amount" : 1,
+    "startDay" : "2025-12-20",
+    "endDay" : "2025-12-22",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 290.0
+  },
+  {
+    "notification" : {
+      "name" : "Nike Tennis Shoes",
+      "publisher" : {
+        "name" : "Mikko",
+        "address" : "Tekniikkakatu 13",
+        "phoneNumber" : "040302928"
+      },
+      "pricePerDay" : 15.0,
+      "pricePerHour" : 5.0,
+      "description" : "Pretty old but clean nike tennis shoes size 41",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Erkki",
+      "address" : "Esimerkki",
+      "phoneNumber" : "0408675499"
+    },
+    "amount" : 1,
+    "startDay" : "2025-12-20",
+    "endDay" : "2025-12-22",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 290.0
+  },
+  {
+    "notification" : {
+      "name" : "Volvo car",
+      "publisher" : {
+        "name" : "Mikko Mallikas",
+        "address" : "Autokatu 8",
+        "phoneNumber" : "045567899"
+      },
+      "pricePerDay" : 100.0,
+      "pricePerHour" : 20.0,
+      "description" : "2021 year volvo v70 color black",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Erkki",
+      "address" : "Esimerkki",
+      "phoneNumber" : "0408675499"
+    },
+    "amount" : 1,
+    "startDay" : "2025-12-20",
+    "endDay" : "2025-12-22",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 290.0
+  },
+  {
+    "notification" : {
+      "name" : "Tennis balls",
+      "publisher" : {
+        "name" : "Veijo Kauppinen",
+        "address" : "Tietotie 4",
+        "phoneNumber" : "03003489438"
+      },
+      "pricePerDay" : 10.0,
+      "pricePerHour" : 3.0,
+      "description" : "10 balls total brand new",
+      "category" : {
+        "categoryName" : "Other"
+      },
+      "amount" : 1
+    },
+    "whoRented" : {
+      "name" : "Erkki",
+      "address" : "Esimerkki",
+      "phoneNumber" : "0408675499"
+    },
+    "amount" : 1,
+    "startDay" : "2025-12-20",
+    "endDay" : "2025-12-22",
+    "startHour" : 0,
+    "endHour" : 24,
+    "price" : 290.0
+  }
+]
